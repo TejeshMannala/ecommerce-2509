@@ -92,6 +92,14 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'ok', service: 'ecommerce-api' });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', service: 'ecommerce-api' });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/admin-auth', adminAuthRoutes);
 app.use('/api/admin/product-categories', adminCategoryRoutes);
