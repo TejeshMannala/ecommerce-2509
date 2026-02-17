@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: ecommerce-api
+    env: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: TRUST_PROXY
+        value: 1
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://ecommerce-frontend.onrender.com,https://ecommerce-admin.onrender.com
+
+  - type: static
+    name: ecommerce-frontend
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://ecommerce-api.onrender.com/api
+
+  - type: static
+    name: ecommerce-admin
+    rootDir: admin-frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_ADMIN_API_URL
+        value: https://ecommerce-api.onrender.com/api
