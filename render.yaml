@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://ecommerce-frontend.onrender.com,https://ecommerce-admin.onrender.com
+        value: https://freshbay.onrender.com,https://ecommerce-admin.onrender.com
 
   - type: static
     name: ecommerce-frontend
