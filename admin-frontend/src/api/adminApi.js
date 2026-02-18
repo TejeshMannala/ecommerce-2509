@@ -14,6 +14,9 @@ async function request(path, options = {}) {
 
   if (token) {
     headers.Authorization = `Bearer ${token}`
+    console.log('Sending request with token to:', path)
+  } else {
+    console.warn('No admin token found for request to:', path)
   }
 
   let response
@@ -22,6 +25,13 @@ async function request(path, options = {}) {
       ...options,
       headers,
     })
+    
+    console.log('Response status:', response.status, 'for path:', path)
+    if (response.status === 401) {
+      console.error('401 Unauthorized for path:', path)
+      console.error('Headers sent:', headers)
+      console.error('Token:', token)
+    }
   } catch (error) {
     throw new Error(`Cannot connect to API server (${API_BASE_URL}). Start backend and try again.`)
   }

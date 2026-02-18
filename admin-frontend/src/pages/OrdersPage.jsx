@@ -25,10 +25,23 @@ function OrdersPage() {
     setLoading(true)
     setError('')
     try {
+      const token = localStorage.getItem('adminToken')
+      console.log('Admin token found:', !!token)
+      if (!token) {
+        setError('No admin token found. Please log in first.')
+        return
+      }
       const data = await adminApi.getOrders()
       setOrders(Array.isArray(data?.orders) ? data.orders : [])
     } catch (err) {
-      setError(err.message || 'Failed to load orders')
+      console.error('Failed to load orders:', err)
+      if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+        setError('Authentication failed. Please log in again.')
+        localStorage.removeItem('adminToken')
+        localStorage.removeItem('admin')
+      } else {
+        setError(err.message || 'Failed to load orders')
+      }
     } finally {
       setLoading(false)
     }

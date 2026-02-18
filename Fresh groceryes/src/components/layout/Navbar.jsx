@@ -295,11 +295,11 @@ const Navbar = () => {
           {/* Logo and Brand */}
           <div className="flex items-center shrink-0">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-fresh-green rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">FM</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">🛒</span>
               </div>
-              <span className="text-xl font-bold text-gray-900 text-gradient hidden sm:block">
-                Fresh Market
+              <span className="text-xl font-bold text-gray-900 hidden sm:block">
+                Fresh Grocery
               </span>
             </Link>
           </div>
@@ -640,38 +640,43 @@ const Navbar = () => {
               </div>
             )}
           </form>
+        </div>
 
-          <div className="hide-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-            {categoryItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeCategory === item.value && isProductsPage;
+        {/* Category Scrollbar - Always visible and fixed position */}
+        <div className="sticky top-0 z-50 bg-white border-t border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="hide-scrollbar flex items-center gap-2 overflow-x-auto py-3">
+              {categoryItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeCategory === item.value && isProductsPage;
 
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => handleCategorySelect(item.value)}
-                  className={`flex h-10 shrink-0 items-center gap-1 rounded-lg border px-2 text-[10px] font-semibold transition-colors ${
-                    isActive
-                      ? 'border-primary-300 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 bg-white text-gray-700'
-                  }`}
-                >
-                  <span
-                    className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${
-                      isActive ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-600'
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleCategorySelect(item.value)}
+                    className={`flex h-10 shrink-0 items-center gap-1 rounded-lg border px-3 text-[10px] font-semibold transition-colors ${
+                      isActive
+                        ? 'border-primary-300 bg-primary-50 text-primary-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-200 hover:text-primary-700'
                     }`}
                   >
-                    <Icon className="h-2.5 w-2.5" />
-                  </span>
-                  <span className="whitespace-nowrap">{item.mobileLabel || item.label}</span>
-                </button>
-              );
-            })}
+                    <span
+                      className={`inline-flex h-5 w-5 items-center justify-center rounded-full ${
+                        isActive ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      <Icon className="h-2.5 w-2.5" />
+                    </span>
+                    <span className="whitespace-nowrap">{item.mobileLabel || item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="hide-scrollbar hidden md:flex items-center gap-2 overflow-x-auto pb-4">
+        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-4">
           {categoryItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeCategory === item.value && isProductsPage;

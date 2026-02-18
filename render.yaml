@@ -44,4 +44,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_ADMIN_API_URL
-        value: https://ecommerce-api.onrender.com/api
+        value: https://ecommerce-2509-server.onrender.com/api

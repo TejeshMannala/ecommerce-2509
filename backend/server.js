@@ -130,6 +130,12 @@ const startServer = async () => {
   try {
     await connectDB();
     const PORT = process.env.PORT || 5000;
+    const jwtSecret = process.env.JWT_SECRET;
+    
+    console.log(`Server starting on port ${PORT}`);
+    console.log(`JWT Secret loaded: ${jwtSecret ? 'SECRET_PROVIDED' : 'MISSING'}`);
+    console.log(`JWT Secret length: ${jwtSecret ? jwtSecret.length : 0}`);
+    
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
