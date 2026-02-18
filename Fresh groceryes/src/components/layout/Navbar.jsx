@@ -642,10 +642,11 @@ const Navbar = () => {
           </form>
         </div>
 
-        {/* Category Scrollbar - Always visible and fixed position */}
+        {/* Category Navigation - Mobile and Desktop */}
         <div className="sticky top-0 z-50 bg-white border-t border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="hide-scrollbar flex items-center gap-2 overflow-x-auto py-3">
+            {/* Mobile Categories - Hidden on desktop */}
+            <div className="md:hidden hide-scrollbar flex items-center gap-2 overflow-x-auto py-3">
               {categoryItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeCategory === item.value && isProductsPage;
@@ -673,36 +674,37 @@ const Navbar = () => {
                 );
               })}
             </div>
-          </div>
-        </div>
 
-        <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-4">
-          {categoryItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeCategory === item.value && isProductsPage;
+            {/* Desktop Categories - Hidden on mobile */}
+            <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-4">
+              {categoryItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeCategory === item.value && isProductsPage;
 
-            return (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => handleCategorySelect(item.value)}
-                className={`flex min-w-[140px] items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
-                  isActive
-                    ? 'border-primary-300 bg-primary-50 text-primary-700'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-primary-200 hover:text-primary-700'
-                }`}
-                >
-                  <span
-                    className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${
-                      isActive ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-600'
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleCategorySelect(item.value)}
+                    className={`flex min-w-[140px] items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+                      isActive
+                        ? 'border-primary-300 bg-primary-50 text-primary-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-primary-200 hover:text-primary-700'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                  </span>
-                <span className="whitespace-nowrap">{item.desktopLabel || item.label}</span>
-              </button>
-            );
-          })}
+                    <span
+                      className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${
+                        isActive ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="whitespace-nowrap">{item.desktopLabel || item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 

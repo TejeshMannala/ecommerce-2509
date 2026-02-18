@@ -54,6 +54,21 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Custom scrollbar styles */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Ensure scroll functionality still works */
+.hide-scrollbar {
+  scroll-behavior: smooth;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
