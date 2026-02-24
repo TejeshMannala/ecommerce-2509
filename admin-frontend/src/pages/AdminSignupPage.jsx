@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { isAdminAuthenticated, setAdminSession } from '../utils/adminAuth'
+import { getApiBaseUrl } from '../config/apiBaseUrl'
 
-const API_BASE_URL =
-  (import.meta.env.VITE_ADMIN_API_URL && String(import.meta.env.VITE_ADMIN_API_URL).trim()) ||
-  (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
-  (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')
+const API_BASE_URL = getApiBaseUrl()
 
 function AdminSignupPage() {
   const navigate = useNavigate()
