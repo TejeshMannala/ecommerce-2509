@@ -1,4 +1,5 @@
 const LEGACY_BACKEND_HOST = 'ecommerce-2509-server.onrender.com'
+const LEGACY_BACKEND_API_URL = 'https://ecommerce-2509-server.onrender.com/api'
 const CURRENT_BACKEND_API_URL = 'https://ecommerce-api.onrender.com/api'
 const API_SUFFIX = '/api'
 const ABSOLUTE_HTTP_PATTERN = /^https?:\/\//i
@@ -35,4 +36,34 @@ export const getApiBaseUrl = () => {
   const resolved = configured.includes(LEGACY_BACKEND_HOST) ? CURRENT_BACKEND_API_URL : configured
   const safeResolved = shouldForceBackendUrl(resolved) ? CURRENT_BACKEND_API_URL : resolved
   return normalizeApiBaseUrl(safeResolved)
+}
+
+export const getApiBaseUrlCandidates = () =>
+  Array.from(new Set([getApiBaseUrl(), CURRENT_BACKEND_API_URL, LEGACY_BACKEND_API_URL]))
+
+const withTimeout = async (url, options = {}, timeoutMs = 20000) => {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+export const fetchWithApiFallback = async (path, options = {}, timeoutMs = 20000) => {
+  const normalizedPath = String(path || '').startsWith('/') ? String(path || '') : `/${String(path || '')}`
+  const candidates = getApiBaseUrlCandidates()
+  let lastError
+
+  for (const baseUrl of candidates) {
+    try {
+      const response = await withTimeout(`${baseUrl}${normalizedPath}`, options, timeoutMs)
+      return { response, baseUrl }
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError || new Error('Network request failed')
 }

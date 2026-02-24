@@ -1,5 +1,5 @@
 import { getAdminToken } from '../utils/adminAuth'
-import { getApiBaseUrl } from '../config/apiBaseUrl'
+import { fetchWithApiFallback, getApiBaseUrl } from '../config/apiBaseUrl'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -18,11 +18,11 @@ async function request(path, options = {}) {
   }
 
   let response
+  let usedBaseUrl = API_BASE_URL
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
-      ...options,
-      headers,
-    })
+    const result = await fetchWithApiFallback(path, { ...options, headers })
+    response = result.response
+    usedBaseUrl = result.baseUrl
     
     console.log('Response status:', response.status, 'for path:', path)
     if (response.status === 401) {
@@ -30,8 +30,8 @@ async function request(path, options = {}) {
       console.error('Headers sent:', headers)
       console.error('Token:', token)
     }
-  } catch (error) {
-    throw new Error(`Cannot connect to API server (${API_BASE_URL}). Start backend and try again.`)
+  } catch (_error) {
+    throw new Error(`Cannot connect to API server (${usedBaseUrl}).`)
   }
 
   const data = await response.json().catch(() => ({}))
@@ -88,7 +88,7 @@ export const adminApi = {
     const formData = new FormData()
     formData.append('image', file)
 
-    const response = await fetch(`${API_BASE_URL}/admin/uploads/product-image`, {
+    const { response } = await fetchWithApiFallback('/admin/uploads/product-image', {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData,

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { isAdminAuthenticated, setAdminSession } from '../utils/adminAuth'
-import { getApiBaseUrl } from '../config/apiBaseUrl'
+import { fetchWithApiFallback, getApiBaseUrl } from '../config/apiBaseUrl'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -32,7 +32,7 @@ function AdminLoginPage() {
     setError('')
 
     try {
-      const response = await fetch(`${API_BASE_URL}/admin-auth/login`, {
+      const { response } = await fetchWithApiFallback('/admin-auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
