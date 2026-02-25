@@ -22,11 +22,12 @@ async function request(path, options = {}) {
   let response
   let usedBaseUrl = API_BASE_URL
   try {
+    console.log('Making request to path:', path, 'with headers:', headers)
     const result = await fetchWithApiFallback(path, { ...options, headers })
     response = result.response
     usedBaseUrl = result.baseUrl
     
-    console.log('Response status:', response.status, 'for path:', path)
+    console.log('Response status:', response.status, 'for path:', path, 'from URL:', usedBaseUrl)
     if (response.status === 401) {
       console.error('401 Unauthorized for path:', path)
       console.error('Headers sent:', headers)
@@ -38,7 +39,8 @@ async function request(path, options = {}) {
         localStorage.removeItem('admin')
       }
     }
-  } catch {
+  } catch (error) {
+    console.error('Request failed for path:', path, 'Error:', error.message)
     throw new Error(`Cannot connect to API server (${usedBaseUrl}).`)
   }
 

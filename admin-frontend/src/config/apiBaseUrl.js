@@ -4,10 +4,22 @@ const CURRENT_BACKEND_API_URL = 'https://ecommerce-api.onrender.com/api'
 const API_SUFFIX = '/api'
 const ABSOLUTE_HTTP_PATTERN = /^https?:\/\//i
 
-const getConfiguredUrl = () =>
-  (import.meta.env.VITE_ADMIN_API_URL && String(import.meta.env.VITE_ADMIN_API_URL).trim()) ||
-  (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
-  (import.meta.env.DEV ? 'http://localhost:5000/api' : CURRENT_BACKEND_API_URL)
+const getConfiguredUrl = () => {
+  const adminApiUrl = import.meta.env.VITE_ADMIN_API_URL
+  const apiUrl = import.meta.env.VITE_API_URL
+  const isDev = import.meta.env.DEV
+  
+  console.log('Environment variables debug:', {
+    VITE_ADMIN_API_URL: adminApiUrl,
+    VITE_API_URL: apiUrl,
+    NODE_ENV: import.meta.env.NODE_ENV,
+    DEV: isDev
+  })
+  
+  return (adminApiUrl && String(adminApiUrl).trim()) ||
+    (apiUrl && String(apiUrl).trim()) ||
+    (isDev ? 'http://localhost:5000/api' : CURRENT_BACKEND_API_URL)
+}
 
 const normalizeApiBaseUrl = (url) => {
   const cleaned = String(url || '').trim().replace(/\/+$/, '')
