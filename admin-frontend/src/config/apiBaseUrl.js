@@ -51,8 +51,23 @@ export const getApiBaseUrl = () => {
   return normalizeApiBaseUrl(CURRENT_BACKEND_API_URL)
 }
 
-export const getApiBaseUrlCandidates = () =>
-  Array.from(new Set([getApiBaseUrl(), CURRENT_BACKEND_API_URL, LEGACY_BACKEND_API_URL]))
+export const getApiBaseUrlCandidates = () => {
+  const configured = getConfiguredUrl()
+  const candidates = [getApiBaseUrl()]
+  
+  // Only add fallback URLs if we're not already using the current backend URL
+  if (configured !== CURRENT_BACKEND_API_URL) {
+    candidates.push(CURRENT_BACKEND_API_URL)
+  }
+  
+  // Only add legacy URL if we're in development or if explicitly configured
+  const isDev = import.meta.env.DEV
+  if (isDev || (configured && configured.includes(LEGACY_BACKEND_HOST))) {
+    candidates.push(LEGACY_BACKEND_API_URL)
+  }
+  
+  return Array.from(new Set(candidates))
+}
 
 const withTimeout = async (url, options = {}, timeoutMs = 20000) => {
   const controller = new AbortController()
