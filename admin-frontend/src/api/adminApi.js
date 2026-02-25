@@ -16,6 +16,8 @@ async function request(path, options = {}) {
   } else {
     console.warn('No admin token found for request to:', path)
   }
+  
+  console.log('API Base URL being used:', API_BASE_URL)
 
   let response
   let usedBaseUrl = API_BASE_URL

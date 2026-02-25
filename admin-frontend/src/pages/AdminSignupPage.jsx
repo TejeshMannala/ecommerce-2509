@@ -5,6 +5,8 @@ import { fetchWithApiFallback, getApiBaseUrl } from '../config/apiBaseUrl'
 
 const API_BASE_URL = getApiBaseUrl()
 
+console.log('AdminSignupPage API_BASE_URL:', API_BASE_URL)
+
 function AdminSignupPage() {
   const navigate = useNavigate()
   const [form, setForm] = useState({

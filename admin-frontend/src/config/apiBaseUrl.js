@@ -20,12 +20,22 @@ const normalizeApiBaseUrl = (url) => {
 export const getApiBaseUrl = () => {
   const configured = getConfiguredUrl()
   
+  console.log('API Base URL Debug:', {
+    configured,
+    LEGACY_BACKEND_HOST,
+    CURRENT_BACKEND_API_URL,
+    isLegacy: configured && configured.includes(LEGACY_BACKEND_HOST),
+    usingConfigured: configured && !configured.includes(LEGACY_BACKEND_HOST)
+  })
+  
   // If we have a configured URL and it's not the legacy URL, use it
   if (configured && !configured.includes(LEGACY_BACKEND_HOST)) {
+    console.log('Using configured URL:', configured)
     return normalizeApiBaseUrl(configured)
   }
   
   // If configured URL is legacy or missing, use current backend URL
+  console.log('Using current backend URL:', CURRENT_BACKEND_API_URL)
   return normalizeApiBaseUrl(CURRENT_BACKEND_API_URL)
 }
 
