@@ -85,9 +85,14 @@ const loginAdmin = async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const admin = await Admin.findOne({ email: String(email).trim().toLowerCase() }).select(
-      '+password'
-    );
+    // Try to find admin by email first, then by loginUserName
+    const admin = await Admin.findOne({ 
+      $or: [
+        { email: String(email).trim().toLowerCase() },
+        { loginUserName: String(email).trim().toLowerCase() }
+      ]
+    }).select('+password');
+    
     if (!admin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

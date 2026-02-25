@@ -58,7 +58,13 @@ const withTimeout = async (url, options = {}, timeoutMs = 20000) => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    return await fetch(url, { ...options, signal: controller.signal })
+    console.log('Making fetch request to:', url, 'with timeout:', timeoutMs)
+    const response = await fetch(url, { ...options, signal: controller.signal })
+    console.log('Fetch response received:', response.status, 'for URL:', url)
+    return response
+  } catch (error) {
+    console.error('Fetch error for URL:', url, 'Error:', error.message, 'Error type:', error.constructor.name)
+    throw error
   } finally {
     clearTimeout(timeoutId)
   }
@@ -69,14 +75,25 @@ export const fetchWithApiFallback = async (path, options = {}, timeoutMs = 20000
   const candidates = getApiBaseUrlCandidates()
   let lastError
 
+  console.log('fetchWithApiFallback debug:', {
+    path,
+    normalizedPath,
+    candidates,
+    timeoutMs
+  })
+
   for (const baseUrl of candidates) {
     try {
+      console.log('Trying URL:', `${baseUrl}${normalizedPath}`)
       const response = await withTimeout(`${baseUrl}${normalizedPath}`, options, timeoutMs)
+      console.log('Success with URL:', baseUrl)
       return { response, baseUrl }
     } catch (error) {
+      console.error('Failed URL:', baseUrl, 'Error:', error.message, 'Error type:', error.constructor.name)
       lastError = error
     }
   }
 
+  console.error('All URLs failed, throwing error:', lastError)
   throw lastError || new Error('Network request failed')
 }

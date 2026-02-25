@@ -59,14 +59,14 @@ function AdminLoginPage() {
         <h2>Admin Login</h2>
         <p>Sign in to access the admin dashboard.</p>
 
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">Email or Username</label>
         <input
           id="email"
           name="email"
-          type="email"
+          type="text"
           value={form.email}
           onChange={onChange}
-          placeholder="Enter email"
+          placeholder="Enter email or username"
         />
 
         <label htmlFor="password">Password</label>
@@ -106,6 +106,9 @@ function AdminLoginPage() {
 
         <div className="auth-footer">
           New admin? <Link to="/signup">Create account</Link>
+        </div>
+        <div style={{ fontSize: '12px', color: '#666', marginTop: '10px', textAlign: 'center' }}>
+          You can login with either your email address or username
         </div>
       </form>
     </div>

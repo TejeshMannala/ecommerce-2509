@@ -40,8 +40,11 @@ async function request(path, options = {}) {
       }
     }
   } catch (error) {
-    console.error('Request failed for path:', path, 'Error:', error.message)
-    throw new Error(`Cannot connect to API server (${usedBaseUrl}).`)
+    console.error('Request failed for path:', path, 'Error:', error.message, 'Error type:', error.constructor.name)
+    if (error.name === 'AbortError' || error.message.includes('aborted')) {
+      throw new Error(`Request was cancelled or timed out. Please check your internet connection and try again. (${usedBaseUrl})`)
+    }
+    throw new Error(`Cannot connect to API server (${usedBaseUrl}). Error: ${error.message}`)
   }
 
   const data = await response.json().catch(() => ({}))
