@@ -20,10 +20,15 @@ const shouldForceBackendUrl = (url) => {
   if (!url) return true
   if (!ABSOLUTE_HTTP_PATTERN.test(url)) return !import.meta.env.DEV
 
+  // Don't force legacy URLs - always prefer configured URLs
+  if (url.includes(LEGACY_BACKEND_HOST)) {
+    return false
+  }
+
   if (typeof window !== 'undefined' && window.location?.origin) {
     try {
       return new URL(url).origin === window.location.origin
-    } catch (_error) {
+    } catch {
       return true
     }
   }
