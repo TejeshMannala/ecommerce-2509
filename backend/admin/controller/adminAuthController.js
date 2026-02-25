@@ -16,12 +16,16 @@ const generateToken = (adminId) =>
 
 const signupAdmin = async (req, res) => {
   try {
-    const { loginUserName, name, password, confirmPassword } = req.body;
+    const { email, name, loginUserName, password, confirmPassword } = req.body;
 
-    if (!loginUserName || !name || !password || !confirmPassword) {
+    if (!email || !name || !loginUserName || !password || !confirmPassword) {
       return res.status(400).json({
         message: 'Login username, name, password, and confirm password are required',
       });
+    }
+
+    if (!email.includes('@')) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
     }
 
     if (String(password).length < 6) {
@@ -32,16 +36,28 @@ const signupAdmin = async (req, res) => {
       return res.status(400).json({ message: 'Passwords do not match' });
     }
 
-    const normalizedLoginUserName = String(loginUserName).trim();
-    const existingAdmin = await Admin.findOne({ loginUserName: normalizedLoginUserName });
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const normalizedLoginUserName = String(loginUserName).trim().toLowerCase();
+    
+    const existingAdmin = await Admin.findOne({ 
+      $or: [
+        { email: normalizedEmail },
+        { loginUserName: normalizedLoginUserName }
+      ]
+    });
+    
     if (existingAdmin) {
-      return res.status(409).json({ message: 'Admin already exists with this login username' });
+      if (existingAdmin.email === normalizedEmail) {
+        return res.status(409).json({ message: 'Admin already exists with this email' });
+      }
+      return res.status(409).json({ message: 'Admin already exists with this username' });
     }
 
     const hashedPassword = await bcrypt.hash(String(password), 12);
     const admin = await Admin.create({
-      loginUserName: normalizedLoginUserName,
+      email: normalizedEmail,
       name: String(name).trim(),
+      loginUserName: normalizedLoginUserName,
       password: hashedPassword,
     });
 
@@ -63,13 +79,13 @@ const signupAdmin = async (req, res) => {
 
 const loginAdmin = async (req, res) => {
   try {
-    const { loginUserName, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!loginUserName || !password) {
-      return res.status(400).json({ message: 'Login username and password are required' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const admin = await Admin.findOne({ loginUserName: String(loginUserName).trim() }).select(
+    const admin = await Admin.findOne({ email: String(email).trim().toLowerCase() }).select(
       '+password'
     );
     if (!admin) {

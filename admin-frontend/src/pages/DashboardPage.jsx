@@ -151,11 +151,14 @@ function DashboardPage() {
       setStatsLoading(true)
       setStatsError('')
       try {
+        console.log('Loading dashboard stats')
         const [productsRes, firstOrdersRes, usersRes] = await Promise.all([
           adminApi.getProducts({ page: 1, limit: 1 }),
           adminApi.getOrders({ page: 1, limit: 100, sortBy: 'createdAt', order: 'desc' }),
           adminApi.getUsers({ page: 1, limit: 1 }),
         ])
+
+        console.log('Dashboard API responses:', { productsRes, firstOrdersRes, usersRes })
 
         const allOrders = Array.isArray(firstOrdersRes?.orders) ? [...firstOrdersRes.orders] : []
         const totalPages = Number(firstOrdersRes?.pagination?.totalPages || 1)
@@ -181,6 +184,7 @@ function DashboardPage() {
         })
         setOrdersForRevenue(allOrders)
       } catch (error) {
+        console.error('Failed to load dashboard stats:', error)
         setStatsError(error.message || 'Failed to load dashboard totals')
       } finally {
         setStatsLoading(false)

@@ -38,10 +38,12 @@ function ProductsPage() {
     setLoading(true)
     setError('')
     try {
+      console.log('Loading products for page:', targetPage)
       const data = await adminApi.getProducts({
         page: String(targetPage),
         limit: '7',
       })
+      console.log('Products API response:', data)
       setProducts(Array.isArray(data?.products) ? data.products : [])
       setPagination({
         total: Number(data?.pagination?.total || 0),
@@ -50,6 +52,7 @@ function ProductsPage() {
       })
       setPage(Number(data?.pagination?.page || targetPage))
     } catch (err) {
+      console.error('Failed to load products:', err)
       setError(err.message || 'Failed to load products')
     } finally {
       setLoading(false)
@@ -58,7 +61,9 @@ function ProductsPage() {
 
   const loadCategories = async () => {
     try {
+      console.log('Loading product categories')
       const data = await adminApi.getProductCategories()
+      console.log('Categories API response:', data)
       const list = Array.isArray(data?.categories) ? data.categories : []
       setCategories(list)
       setForm((prev) => ({
@@ -66,6 +71,7 @@ function ProductsPage() {
         category: prev.category || list[0] || '',
       }))
     } catch (err) {
+      console.error('Failed to load categories:', err)
       setError(err.message || 'Failed to load categories')
     }
   }

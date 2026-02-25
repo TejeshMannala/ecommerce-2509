@@ -29,8 +29,14 @@ async function request(path, options = {}) {
       console.error('401 Unauthorized for path:', path)
       console.error('Headers sent:', headers)
       console.error('Token:', token)
+      // Clear invalid token
+      if (token) {
+        console.log('Clearing invalid token')
+        localStorage.removeItem('adminToken')
+        localStorage.removeItem('admin')
+      }
     }
-  } catch (_error) {
+  } catch {
     throw new Error(`Cannot connect to API server (${usedBaseUrl}).`)
   }
 

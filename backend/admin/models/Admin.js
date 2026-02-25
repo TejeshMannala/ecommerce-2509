@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 const adminSchema = new mongoose.Schema(
   {
-    loginUserName: {
+    email: {
       type: String,
-      required: [true, 'Login username is required'],
+      required: [true, 'Email is required'],
       unique: true,
       trim: true,
-      minlength: [3, 'Login username must be at least 3 characters'],
-      maxlength: [30, 'Login username cannot exceed 30 characters'],
+      lowercase: true,
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address'],
       index: true,
     },
     name: {
@@ -16,6 +16,13 @@ const adminSchema = new mongoose.Schema(
       required: [true, 'Name is required'],
       trim: true,
       maxlength: [50, 'Name cannot exceed 50 characters'],
+    },
+    loginUserName: {
+      type: String,
+      required: [true, 'Login username is required'],
+      trim: true,
+      unique: true,
+      lowercase: true,
     },
     password: {
       type: String,

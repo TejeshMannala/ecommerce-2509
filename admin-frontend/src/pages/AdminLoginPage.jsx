@@ -7,9 +7,10 @@ const API_BASE_URL = getApiBaseUrl()
 
 function AdminLoginPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ loginUserName: '', password: '' })
+  const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   if (isAdminAuthenticated()) {
     return <Navigate to="/dashboard" replace />
@@ -23,8 +24,8 @@ function AdminLoginPage() {
 
   const onSubmit = async (event) => {
     event.preventDefault()
-    if (!form.loginUserName.trim() || !form.password) {
-      setError('Login username and password are required')
+    if (!form.email.trim() || !form.password) {
+      setError('Email and password are required')
       return
     }
 
@@ -58,24 +59,44 @@ function AdminLoginPage() {
         <h2>Admin Login</h2>
         <p>Sign in to access the admin dashboard.</p>
 
-        <label htmlFor="loginUserName">Login Username</label>
+        <label htmlFor="email">Email</label>
         <input
-          id="loginUserName"
-          name="loginUserName"
-          value={form.loginUserName}
+          id="email"
+          name="email"
+          type="email"
+          value={form.email}
           onChange={onChange}
-          placeholder="Enter login username"
+          placeholder="Enter email"
         />
 
         <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={onChange}
-          placeholder="Enter password"
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={form.password}
+            onChange={onChange}
+            placeholder="Enter password"
+            style={{ paddingRight: '40px' }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{ 
+              position: 'absolute', 
+              right: '10px', 
+              top: '50%', 
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            {showPassword ? '🔒' : '👁️'}
+          </button>
+        </div>
 
         {error ? <div className="auth-error">{error}</div> : null}
 
