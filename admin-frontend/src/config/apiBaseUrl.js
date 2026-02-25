@@ -16,9 +16,18 @@ const getConfiguredUrl = () => {
     DEV: isDev
   })
   
-  return (adminApiUrl && String(adminApiUrl).trim()) ||
+  // Force correct URL if we detect the old URL is being used
+  const configuredUrl = (adminApiUrl && String(adminApiUrl).trim()) ||
     (apiUrl && String(apiUrl).trim()) ||
     (isDev ? 'http://localhost:5000/api' : CURRENT_BACKEND_API_URL)
+  
+  // If we detect the old URL, force the correct one
+  if (configuredUrl && configuredUrl.includes('ecommerce-2509-server.onrender.com')) {
+    console.warn('Detected old backend URL, forcing correct URL:', CURRENT_BACKEND_API_URL)
+    return CURRENT_BACKEND_API_URL
+  }
+  
+  return configuredUrl
 }
 
 const normalizeApiBaseUrl = (url) => {
