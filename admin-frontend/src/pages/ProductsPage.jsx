@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { adminApi } from '../api/adminApi'
 
 const initialForm = {
@@ -34,7 +34,7 @@ function ProductsPage() {
     [editingId]
   )
 
-  const loadProducts = async (targetPage = page) => {
+  const loadProducts = useCallback(async (targetPage = page) => {
     setLoading(true)
     setError('')
     try {
@@ -57,7 +57,7 @@ function ProductsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page])
 
   const loadCategories = async () => {
     try {
@@ -78,7 +78,7 @@ function ProductsPage() {
 
   useEffect(() => {
     loadProducts(page)
-  }, [page])
+  }, [page, loadProducts])
 
   useEffect(() => {
     loadCategories()

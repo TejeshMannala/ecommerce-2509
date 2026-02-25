@@ -78,7 +78,7 @@ export const getApiBaseUrlCandidates = () => {
   return Array.from(new Set(candidates))
 }
 
-const withTimeout = async (url, options = {}, timeoutMs = 20000) => {
+const withTimeout = async (url, options = {}, timeoutMs = 30000) => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -88,6 +88,14 @@ const withTimeout = async (url, options = {}, timeoutMs = 20000) => {
     return response
   } catch (error) {
     console.error('Fetch error for URL:', url, 'Error:', error.message, 'Error type:', error.constructor.name)
+    
+    // Provide more specific error messages
+    if (error.name === 'AbortError' || error.message.includes('aborted')) {
+      throw new Error(`Request timed out after ${timeoutMs}ms. Please check your internet connection and try again. (${url})`)
+    } else if (error.message.includes('fetch')) {
+      throw new Error(`Network error: Unable to connect to server. Please check your internet connection and try again. (${url})`)
+    }
+    
     throw error
   } finally {
     clearTimeout(timeoutId)

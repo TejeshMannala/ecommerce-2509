@@ -23,7 +23,7 @@ async function request(path, options = {}) {
   let usedBaseUrl = API_BASE_URL
   try {
     console.log('Making request to path:', path, 'with headers:', headers)
-    const result = await fetchWithApiFallback(path, { ...options, headers })
+    const result = await fetchWithApiFallback(path, { ...options, headers }, 30000)
     response = result.response
     usedBaseUrl = result.baseUrl
     
@@ -42,7 +42,7 @@ async function request(path, options = {}) {
   } catch (error) {
     console.error('Request failed for path:', path, 'Error:', error.message, 'Error type:', error.constructor.name)
     if (error.name === 'AbortError' || error.message.includes('aborted')) {
-      throw new Error(`Request was cancelled or timed out. Please check your internet connection and try again. (${usedBaseUrl})`)
+      throw new Error(`Request timed out after 30 seconds. Please check your internet connection and try again. (${usedBaseUrl})`)
     }
     throw new Error(`Cannot connect to API server (${usedBaseUrl}). Error: ${error.message}`)
   }
