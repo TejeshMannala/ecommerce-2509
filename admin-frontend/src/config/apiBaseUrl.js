@@ -16,31 +16,17 @@ const normalizeApiBaseUrl = (url) => {
   return `${cleaned}${API_SUFFIX}`
 }
 
-const shouldForceBackendUrl = (url) => {
-  if (!url) return true
-  if (!ABSOLUTE_HTTP_PATTERN.test(url)) return !import.meta.env.DEV
-
-  // Don't force legacy URLs - always prefer configured URLs
-  if (url.includes(LEGACY_BACKEND_HOST)) {
-    return false
-  }
-
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    try {
-      return new URL(url).origin === window.location.origin
-    } catch {
-      return true
-    }
-  }
-
-  return false
-}
 
 export const getApiBaseUrl = () => {
   const configured = getConfiguredUrl()
-  const resolved = configured.includes(LEGACY_BACKEND_HOST) ? CURRENT_BACKEND_API_URL : configured
-  const safeResolved = shouldForceBackendUrl(resolved) ? CURRENT_BACKEND_API_URL : resolved
-  return normalizeApiBaseUrl(safeResolved)
+  
+  // If we have a configured URL and it's not the legacy URL, use it
+  if (configured && !configured.includes(LEGACY_BACKEND_HOST)) {
+    return normalizeApiBaseUrl(configured)
+  }
+  
+  // If configured URL is legacy or missing, use current backend URL
+  return normalizeApiBaseUrl(CURRENT_BACKEND_API_URL)
 }
 
 export const getApiBaseUrlCandidates = () =>
