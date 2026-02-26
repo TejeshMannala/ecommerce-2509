@@ -37,9 +37,9 @@ function AdminLoginPage() {
         body: JSON.stringify(form),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
       if (!response.ok) {
-        throw new Error(data?.message || 'Failed to login')
+        throw new Error(data?.message || `Login failed (${response.status})`)
       }
 
       setAdminSession({ token: data.token, admin: data.admin })

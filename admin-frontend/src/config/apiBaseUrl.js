@@ -45,11 +45,15 @@ export const getApiBaseUrl = () => {
 export const getApiBaseUrlCandidates = () => {
   const configured = getConfiguredUrl()
   const normalizedConfigured = normalizeApiBaseUrl(configured)
+  if (!import.meta.env.DEV) {
+    // In production, fail fast on the configured backend.
+    return [normalizedConfigured]
+  }
   const known = KNOWN_BACKEND_API_URLS.map((url) => normalizeApiBaseUrl(url))
   return Array.from(new Set([normalizedConfigured, ...known]))
 }
 
-const withTimeout = async (url, options = {}, timeoutMs = 60000) => {
+const withTimeout = async (url, options = {}, timeoutMs = 10000) => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -57,7 +61,7 @@ const withTimeout = async (url, options = {}, timeoutMs = 60000) => {
     return response
   } catch (error) {
     if (error.name === 'AbortError' || error.message.includes('aborted')) {
-      throw new Error(`Request timed out after ${timeoutMs}ms. Backend may be cold-starting or unavailable. (${url})`)
+      throw new Error(`Request timed out after ${timeoutMs}ms. Backend may be unavailable. (${url})`)
     }
     if (error.message.includes('fetch')) {
       throw new Error(`Network error: Unable to connect to server. Please check your internet connection and try again. (${url})`)
@@ -68,7 +72,7 @@ const withTimeout = async (url, options = {}, timeoutMs = 60000) => {
   }
 }
 
-export const fetchWithApiFallback = async (path, options = {}, timeoutMs = 60000) => {
+export const fetchWithApiFallback = async (path, options = {}, timeoutMs = 10000) => {
   const normalizedPath = String(path || '').startsWith('/') ? String(path || '') : `/${String(path || '')}`
   const candidates = getApiBaseUrlCandidates()
   let lastError

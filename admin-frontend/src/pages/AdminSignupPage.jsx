@@ -50,9 +50,9 @@ function AdminSignupPage() {
         body: JSON.stringify(form),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => ({}))
       if (!response.ok) {
-        throw new Error(data?.message || 'Failed to signup')
+        throw new Error(data?.message || `Signup failed (${response.status})`)
       }
 
       setAdminSession({ token: data.token, admin: data.admin })
