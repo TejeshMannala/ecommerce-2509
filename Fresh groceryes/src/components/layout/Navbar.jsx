@@ -520,13 +520,13 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         <div
-          className={`md:hidden fixed inset-x-0 top-20 z-50 px-4 transition-all duration-300 ease-out ${
+          className={`md:hidden fixed inset-x-0 top-20 bottom-0 z-50 bg-white transition-all duration-300 ease-out max-[350px]:inset-x-auto max-[350px]:right-2 max-[350px]:top-[4.5rem] max-[350px]:bottom-auto max-[350px]:w-[60vw] max-[350px]:rounded-xl max-[350px]:border max-[350px]:border-gray-200 max-[350px]:shadow-xl ${
             isMenuOpen
               ? 'translate-y-0 opacity-100 pointer-events-auto'
               : '-translate-y-2 opacity-0 pointer-events-none'
           }`}
         >
-          <div className="max-h-[calc(100vh-5.5rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-xl">
+          <div className="h-full overflow-y-auto bg-white max-[350px]:h-auto max-[350px]:max-h-[70vh] max-[350px]:rounded-xl">
             <div className="px-5 py-4 space-y-2">
               <Link
                 to="/"
@@ -675,7 +675,11 @@ const Navbar = () => {
         <div className="sticky top-0 z-50 bg-white border-t border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4">
             {/* Mobile Categories - Hidden on desktop */}
-            <div className="md:hidden hide-scrollbar flex items-center gap-2 overflow-x-auto py-3">
+            <div
+              className={`md:hidden hide-scrollbar items-center gap-2 overflow-x-auto py-3 ${
+                isMenuOpen ? 'hidden' : 'flex'
+              }`}
+            >
               {categoryItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeCategory === item.value && isProductsPage;
