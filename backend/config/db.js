@@ -19,12 +19,13 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(mongoUri);
     console.log(`MongoDB connected: ${conn.connection.host}`);
+    return conn;
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
     if (error.code === 8000 || /bad auth/i.test(error.message)) {
       logAuthTroubleshooting();
     }
-    process.exit(1);
+    throw error;
   }
 };
 

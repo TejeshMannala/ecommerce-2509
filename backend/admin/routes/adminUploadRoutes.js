@@ -7,7 +7,10 @@ const { uploadProductImage } = require('../controller/adminUploadController');
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'products');
+const baseUploadDir = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '..', '..', 'uploads');
+const uploadDir = path.join(baseUploadDir, 'products');
 fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
