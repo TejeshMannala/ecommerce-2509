@@ -11,7 +11,7 @@ const Input = ({
   ...props 
 }) => {
   const baseInputClasses =
-    'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200';
+    'w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 max-[350px]:px-2.5 max-[350px]:py-2 max-[350px]:text-xs';
   
   const inputClasses = [
     baseInputClasses,
@@ -24,7 +24,7 @@ const Input = ({
   return (
     <div className={`space-y-1 ${className}`}>
       {label && (
-        <label className={`block text-sm font-medium text-gray-700 ${labelClassName}`}>
+        <label className={`block text-sm font-medium text-gray-700 max-[350px]:text-xs ${labelClassName}`}>
           {label}
         </label>
       )}
@@ -45,7 +45,7 @@ const Input = ({
         )}
       </div>
       {error && (
-        <p className="text-red-600 text-sm">{error}</p>
+        <p className="text-red-600 text-sm break-words max-[350px]:text-xs">{error}</p>
       )}
     </div>
   );

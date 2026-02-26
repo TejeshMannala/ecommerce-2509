@@ -117,23 +117,23 @@ const Login = () => {
   const submitError = errors.submit || (authError ? (typeof authError === 'string' ? authError : authError.message || 'Authentication failed') : null);
 
   return (
-    <><div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-6 sm:py-10">
+    <><div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-6 sm:py-10 max-[350px]:px-2 max-[350px]:py-4">
       <div className="mx-auto w-full max-w-md">
-        <div className="mb-3">
+        <div className="mb-3 max-[350px]:mb-2">
           <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             Back
           </Button>
         </div>
 
-        <div className="mb-5 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-fresh-green">
-            <span className="text-lg font-bold text-white">FM</span>
+        <div className="mb-5 text-center max-[350px]:mb-4">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-fresh-green max-[350px]:h-12 max-[350px]:w-12">
+            <span className="text-lg font-bold text-white max-[350px]:text-base">FM</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="mt-1 text-sm text-gray-600">Sign in to continue shopping</p>
+          <h1 className="text-2xl font-bold text-gray-900 max-[350px]:text-xl">Welcome Back</h1>
+          <p className="mt-1 text-sm text-gray-600 max-[350px]:text-xs">Sign in to continue shopping</p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 max-[350px]:rounded-xl max-[350px]:p-3">
           {redirectedFromProtectedPage && (
             <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
               <p className="text-sm text-blue-700">Please sign in to continue with protected actions.</p>
@@ -188,20 +188,20 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="mt-4 flex justify-between text-sm">
+          <div className="mt-4 flex justify-between gap-2 text-sm max-[350px]:mt-3 max-[350px]:flex-col max-[350px]:text-xs">
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-left text-primary-600 hover:text-primary-700 font-medium"
             >
               Forgot Password?
             </button>
             <button
               type="button"
               onClick={() => navigate('/register', { replace: true })}
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-left text-primary-600 hover:text-primary-700 font-medium"
             >
-              Dont have an account? Sign Up
+              Don't have an account? Sign Up
             </button>
           </div>
         </div>

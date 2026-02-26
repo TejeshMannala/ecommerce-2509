@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import {
   Search,
   X,
+  ArrowLeft,
   Heart,
   ShoppingCart,
   User,
@@ -220,6 +221,19 @@ const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMenuOpen]);
+
   const handleLogout = () => {
     logoutUser();
     setIsMenuOpen(false);
@@ -303,6 +317,17 @@ const Navbar = () => {
               </span>
             </Link>
           </div>
+
+          {location.pathname !== '/' && (
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="hidden sm:inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors hover:border-primary-300 hover:text-primary-700"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Home
+            </button>
+          )}
 
           {/* Desktop Search */}
           <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center flex-1 justify-center px-4">
@@ -477,110 +502,114 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
-            <div className="relative">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-                aria-label="Toggle navigation menu"
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-primary-600 transition-colors"
+              aria-label="Toggle navigation menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div
+          className={`md:hidden fixed inset-x-0 top-20 z-50 px-4 transition-all duration-300 ease-out ${
+            isMenuOpen
+              ? 'translate-y-0 opacity-100 pointer-events-auto'
+              : '-translate-y-2 opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="max-h-[calc(100vh-5.5rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-white shadow-xl">
+            <div className="px-5 py-4 space-y-2">
+              <Link
+                to="/"
+                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {isMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
+                Home
+              </Link>
+              <Link
+                to="/products"
+                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link
+                to="/about"
+                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                to={wishlistDestination}
+                state={wishlistLinkState}
+                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Wishlist
+              </Link>
+              <Link
+                to={cartDestination}
+                state={cartLinkState}
+                className="block py-2 text-gray-700 hover:text-primary-600 transition-colors relative"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Cart
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-6 bg-primary-600 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
 
-              {/* Mobile Navigation */}
-              {isMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 z-50 w-[50vw] h-auto rounded-xl border border-gray-200 bg-white shadow-lg">
-                  <div className="px-4 py-3 space-y-2">
-                    <Link
-                      to="/"
-                      className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Home
-                    </Link>
-                    <Link
-                      to="/products"
-                      className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Products
-                    </Link>
-                    <Link
-                      to="/about"
-                      className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      About
-                    </Link>
-                    <Link
-                      to={wishlistDestination}
-                      state={wishlistLinkState}
-                      className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Wishlist
-                    </Link>
-                    <Link
-                      to={cartDestination}
-                      state={cartLinkState}
-                      className="block py-2 text-gray-700 hover:text-primary-600 transition-colors relative"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Cart
-                      {itemCount > 0 && (
-                        <span className="absolute -top-1 -right-6 bg-primary-600 text-white text-xs rounded-full h-5 min-w-5 px-1 flex items-center justify-center">
-                          {itemCount}
-                        </span>
-                      )}
-                    </Link>
-
-                    {isLoggedIn ? (
-                      <>
-                        <Link
-                          to="/my-orders"
-                          className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          My Orders
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                        >
-                          Logout
-                        </button>
-                        <div className="mt-2 flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">
-                            {userInitials}
-                          </span>
-                          <span className="min-w-0 truncate text-sm font-medium text-gray-700">{currentUser.name}</span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          to="/login"
-                          className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Login
-                        </Link>
-                        <Link
-                          to="/register"
-                          className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Sign Up
-                        </Link>
-                      </>
-                    )}
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    to="/my-orders"
+                    className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                  >
+                    Logout
+                  </button>
+                  <div className="mt-2 flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">
+                      {userInitials}
+                    </span>
+                    <span className="min-w-0 truncate text-sm font-medium text-gray-700">{currentUser.name}</span>
                   </div>
-                </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block py-2 text-gray-700 hover:text-primary-600 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -676,7 +705,7 @@ const Navbar = () => {
             </div>
 
             {/* Desktop Categories - Hidden on mobile */}
-            <div className="hidden md:flex items-center gap-2 overflow-x-auto pb-4">
+            <div className="hide-scrollbar hidden md:flex items-center gap-2 overflow-x-auto pb-4">
               {categoryItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeCategory === item.value && isProductsPage;

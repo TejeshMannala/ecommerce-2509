@@ -115,17 +115,17 @@ const Register = () => {
   const submitError = errors.submit || authError;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-6 sm:py-10">
+    <div className="min-h-screen bg-gray-50 px-3 py-6 sm:px-6 sm:py-10 max-[350px]:px-2 max-[350px]:py-4">
       <div className="mx-auto w-full max-w-md">
-        <div className="mb-5 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-fresh-green">
-            <span className="text-lg font-bold text-white">FM</span>
+        <div className="mb-5 text-center max-[350px]:mb-4">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-600 to-fresh-green max-[350px]:h-12 max-[350px]:w-12">
+            <span className="text-lg font-bold text-white max-[350px]:text-base">FM</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
-          <p className="mt-1 text-sm text-gray-600">Sign up and start shopping in seconds</p>
+          <h1 className="text-2xl font-bold text-gray-900 max-[350px]:text-xl">Create Account</h1>
+          <p className="mt-1 text-sm text-gray-600 max-[350px]:text-xs">Sign up and start shopping in seconds</p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6 max-[350px]:rounded-xl max-[350px]:p-3">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <Input
               label="Full Name"
@@ -210,11 +210,11 @@ const Register = () => {
             </Button>
           </form>
 
-          <div className="mt-5 text-center">
+          <div className="mt-5 text-center max-[350px]:mt-4">
             <button
               type="button"
               onClick={() => navigate('/login', { replace: true })}
-              className="text-sm font-medium text-primary-700 hover:text-primary-800"
+              className="text-sm font-medium text-primary-700 hover:text-primary-800 max-[350px]:text-xs"
             >
               Already have an account? Sign In
             </button>

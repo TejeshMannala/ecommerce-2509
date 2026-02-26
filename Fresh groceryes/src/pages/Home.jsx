@@ -93,11 +93,15 @@ const offerCards = [
     key: 'highly-consumed',
     title: 'Highly Consumed Products',
     description: 'Most ordered everyday essentials selected for your home.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80',
   },
   {
     key: 'weekly-trending',
     title: 'Weekly Trending Picks',
     description: 'Fast-moving trending products picked from current shopper demand.',
+    imageUrl:
+      'https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
@@ -278,7 +282,7 @@ const Home = () => {
               <p className="text-xs font-semibold text-red-700 sm:text-sm">60% to 70% OFF</p>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto pb-2 sm:gap-4">
+            <div className="hide-scrollbar flex gap-3 overflow-x-auto pb-2 sm:gap-4">
               {topSaleProducts.map((product) => (
                 <Link
                   key={`topsale-${product.id}`}
@@ -338,18 +342,26 @@ const Home = () => {
                       handleOfferCardClick(card.key);
                     }
                   }}
-                  className={`cursor-pointer rounded-xl border p-4 transition-all sm:p-5 ${
+                  className={`group cursor-pointer overflow-hidden rounded-xl border transition-all ${
                     activeOfferKey === card.key
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 bg-white hover:border-primary-300'
+                      ? 'border-primary-500 ring-2 ring-primary-200'
+                      : 'border-gray-200 hover:border-primary-300'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="text-base font-bold text-gray-900 sm:text-lg">{card.title}</h3>
-                      <p className="mt-1 text-xs text-gray-600 sm:text-sm">{card.description}</p>
+                  <div className="relative h-40 sm:h-48">
+                    <img
+                      src={card.imageUrl}
+                      alt={card.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <h3 className="text-base font-bold sm:text-lg">{card.title}</h3>
+                        <ArrowRight className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+                      </div>
+                      <p className="text-xs text-gray-100 sm:text-sm">{card.description}</p>
                     </div>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-primary-700 sm:h-5 sm:w-5" />
                   </div>
                 </div>
               ))}
