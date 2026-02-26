@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { isAdminAuthenticated, setAdminSession } from '../utils/adminAuth'
-import { fetchWithApiFallback, getApiBaseUrl } from '../config/apiBaseUrl'
-
-const API_BASE_URL = getApiBaseUrl()
-
-console.log('AdminSignupPage API_BASE_URL:', API_BASE_URL)
+import { fetchWithApiFallback } from '../config/apiBaseUrl'
 
 function AdminSignupPage() {
   const navigate = useNavigate()

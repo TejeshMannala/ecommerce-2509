@@ -13,28 +13,35 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Links */
 a {
   font-weight: 500;
   color: #646cff;
-  text-decoration: inherit;
+  text-decoration: none;
+  transition: color 0.25s ease;
 }
+
 a:hover {
   color: #535bf2;
 }
 
+/* Body Layout */
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  justify-content: center;
+  align-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
+/* Headings */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* Buttons */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -44,40 +51,44 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Custom scrollbar styles */
+/* Hide Scrollbar (Cross-Browser) */
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none;              /* Chrome, Safari */
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* IE & Edge */
 }
 
-/* Ensure scroll functionality still works */
-.hide-scrollbar {
-  scroll-behavior: smooth;
-}
-
+/* Light Mode */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
+  }
+
+  button:hover {
+    border-color: #747bff;
   }
 }
