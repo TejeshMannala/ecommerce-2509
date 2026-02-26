@@ -1,4 +1,4 @@
-services:
+﻿services:
   - type: web
     name: ecommerce-api
     env: node
@@ -31,7 +31,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: &backend_api_url https://ecommerce-api.onrender.com/api
+        value: &backend_api_url https://ecommerce-2509.vercel.app/api
 
   - type: static
     name: ecommerce-admin
@@ -45,3 +45,4 @@ services:
     envVars:
       - key: VITE_ADMIN_API_URL
         value: *backend_api_url
+

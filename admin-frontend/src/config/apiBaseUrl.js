@@ -1,7 +1,5 @@
-﻿const KNOWN_BACKEND_API_URLS = [
-  'https://ecommerce-api.onrender.com/api',
-  'https://ecommerce-2509.onrender.com/api',
-  'https://ecommerce-2509-server.onrender.com/api',
+const KNOWN_BACKEND_API_URLS = [
+  'https://ecommerce-2509.vercel.app/api',
 ]
 const API_SUFFIX = '/api'
 const ABSOLUTE_HTTP_PATTERN = /^https?:\/\//i

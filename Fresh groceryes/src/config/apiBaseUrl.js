@@ -1,9 +1,6 @@
-﻿const KNOWN_BACKEND_API_URLS = [
-  'https://ecommerce-api.onrender.com/api',
-  'https://ecommerce-2509.onrender.com/api',
-  'https://ecommerce-2509-server.onrender.com/api',
+const KNOWN_BACKEND_API_URLS = [
+  'https://ecommerce-2509.vercel.app/api',
 ]
-const LEGACY_BACKEND_HOST = 'ecommerce-2509-server.onrender.com'
 const API_SUFFIX = '/api'
 const ABSOLUTE_HTTP_PATTERN = /^https?:\/\//i
 
@@ -42,7 +39,6 @@ export const getApiBaseUrlCandidates = () => {
 
 export const getApiBaseUrl = () => {
   const configured = getConfiguredUrl()
-  const resolved = configured.includes(LEGACY_BACKEND_HOST) ? configured : configured
-  const safeResolved = shouldForceBackendUrl(resolved) ? KNOWN_BACKEND_API_URLS[0] : resolved
+  const safeResolved = shouldForceBackendUrl(configured) ? KNOWN_BACKEND_API_URLS[0] : configured
   return normalizeApiBaseUrl(safeResolved)
 }
