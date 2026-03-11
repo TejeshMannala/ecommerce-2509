@@ -1,21 +1,22 @@
-import { getAdminToken } from '../utils/adminAuth'
+import { clearAdminSession, getAdminToken } from '../utils/adminAuth'
 import { fetchWithApiFallback, getApiBaseUrl } from '../config/apiBaseUrl'
 
 const API_BASE_URL = getApiBaseUrl()
 
 async function request(path, options = {}) {
   const token = getAdminToken()
+
+  if (!token) {
+    throw new Error('Session expired. Please log in again.')
+  }
+
   const headers = {
     'Content-Type': 'application/json',
     ...(options.headers || {}),
   }
 
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-    console.log('Sending request with token to:', path)
-  } else {
-    console.warn('No admin token found for request to:', path)
-  }
+  headers.Authorization = `Bearer ${token}`
+  console.log('Sending request with token to:', path)
   
   console.log('API Base URL being used:', API_BASE_URL)
 
@@ -35,8 +36,8 @@ async function request(path, options = {}) {
       // Clear invalid token
       if (token) {
         console.log('Clearing invalid token')
-        localStorage.removeItem('adminToken')
-        localStorage.removeItem('admin')
+        clearAdminSession()
+        window.location.replace('/login')
       }
     }
   } catch (error) {

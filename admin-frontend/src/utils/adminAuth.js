@@ -1,7 +1,37 @@
 const ADMIN_TOKEN_KEY = 'adminToken'
 const ADMIN_KEY = 'admin'
 
-export const getAdminToken = () => localStorage.getItem(ADMIN_TOKEN_KEY) || ''
+const decodeTokenPayload = (token) => {
+  try {
+    const parts = String(token).split('.')
+    if (parts.length !== 3) return null
+
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/')
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')
+    return JSON.parse(atob(padded))
+  } catch {
+    return null
+  }
+}
+
+const isTokenExpired = (token) => {
+  const payload = decodeTokenPayload(token)
+  if (!payload?.exp) return false
+  const nowInSeconds = Math.floor(Date.now() / 1000)
+  return Number(payload.exp) <= nowInSeconds
+}
+
+export const getAdminToken = () => {
+  const token = localStorage.getItem(ADMIN_TOKEN_KEY) || ''
+  if (!token) return ''
+
+  if (isTokenExpired(token)) {
+    clearAdminSession()
+    return ''
+  }
+
+  return token
+}
 
 export const isAdminAuthenticated = () => Boolean(getAdminToken())
 
