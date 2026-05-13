@@ -68,9 +68,16 @@ const explicitOrigins = [
   String(process.env.ADMIN_FRONTEND_URL || '').trim(),
 ].filter(Boolean);
 
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://freshbay.onrender.com',
+  'https://freshbay-admin.onrender.com',
+];
+
 const allowedOrigins = explicitOrigins.length
-  ? Array.from(new Set(explicitOrigins))
-  : ['http://localhost:5173', 'http://localhost:5174'];
+  ? Array.from(new Set([...defaultAllowedOrigins, ...explicitOrigins]))
+  : defaultAllowedOrigins;
 
 if (isProduction() && explicitOrigins.length === 0) {
   throw new Error('Set CORS_ORIGINS (or FRONTEND_URL/ADMIN_FRONTEND_URL) in production');
@@ -107,8 +114,12 @@ app.use(
 
       return callback(new Error('Not allowed by CORS'));
     },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
+app.options(/.*/, cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -118,11 +129,11 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.status(200).json({ status: 'ok', service: 'ecommerce-api' });
+  res.status(200).json({ status: 'ok', service: 'freshbay-api' });
 });
 
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', service: 'ecommerce-api' });
+  res.status(200).json({ status: 'ok', service: 'freshbay-api' });
 });
 
 app.use('/api/auth', authRoutes);
