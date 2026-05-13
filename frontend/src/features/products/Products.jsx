@@ -311,7 +311,6 @@ const Products = () => {
       return;
     }
 
-    const isInWishlist = wishlistItems.some((item) => item.productId === product.id);
     const discountedPrice =
       product.discount > 0 ? product.price - (product.price * product.discount) / 100 : product.price;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Leaf,
@@ -8,6 +8,7 @@ import {
   Star,
   ArrowRight,
   Flame,
+  ShoppingBasket,
 } from 'lucide-react';
 import { applyImageFallback, resolveImageUrl } from '../utils/image';
 import { productAPI } from '../api/productAPI';
@@ -116,6 +117,8 @@ const pickRandomProducts = (source, count) => {
 const Home = () => {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [products, setProducts] = useState([]);
+  const [isProductsLoading, setIsProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState('');
   const [activeOfferKey, setActiveOfferKey] = useState(null);
   const [randomOfferProducts, setRandomOfferProducts] = useState([]);
   const activeSlide = heroSlides[activeSlideIndex];
@@ -126,7 +129,7 @@ const Home = () => {
     backgroundRepeat: 'no-repeat',
   };
 
-  const buildSectionProductsFromList = (category, limit = 10) => {
+  const buildSectionProductsFromList = useCallback((category, limit = 10) => {
     const categoryItems = products.filter((product) => product.category === category);
     if (!categoryItems.length) {
       return [];
@@ -144,7 +147,7 @@ const Home = () => {
         displayName: cycle > 0 ? `${base.name} - ${variant}` : base.name,
       };
     });
-  };
+  }, [products]);
 
   const sectionProducts = useMemo(
     () => {
@@ -164,7 +167,7 @@ const Home = () => {
         items: buildSectionProductsFromList(category, 10),
       }));
     },
-    [products]
+    [buildSectionProductsFromList, products]
   );
 
   const topSaleProducts = useMemo(() => {
@@ -207,11 +210,12 @@ const Home = () => {
 
   useEffect(() => {
     let isMounted = true;
-    console.log('Fetching products from:', productAPI.getProducts);
+    setIsProductsLoading(true);
+    setProductsError('');
+
     productAPI
       .getProducts({ limit: 200, status: 'active' })
       .then((response) => {
-        console.log('Products API response:', response);
         if (isMounted) {
           const normalizedProducts = (Array.isArray(response?.products) ? response.products : []).map(
             (product) => ({
@@ -223,14 +227,18 @@ const Home = () => {
                 (typeof product.images?.[0] === 'string' ? product.images[0] : ''),
             })
           );
-          console.log('Normalized products:', normalizedProducts);
           setProducts(normalizedProducts);
         }
       })
       .catch((error) => {
-        console.error('Failed to fetch products:', error);
         if (isMounted) {
+          setProductsError(error?.response?.data?.message || error?.message || 'Products are unavailable right now.');
           setProducts([]);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsProductsLoading(false);
         }
       });
 
@@ -247,11 +255,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <section className="relative text-white home-hero-bg-image" style={heroBackgroundStyle}>
-        <div className="home-hero-orb home-hero-orb-one" />
-        <div className="home-hero-orb home-hero-orb-two" />
-        <div className="home-hero-orb home-hero-orb-three" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
           <div className="grid grid-cols-1 gap-12 items-center">
             <div className="home-fade-up">
               <div key={activeSlide.id} className="home-slide-content">
@@ -282,52 +286,68 @@ const Home = () => {
               <p className="text-xs font-semibold text-red-700 sm:text-sm">60% to 70% OFF</p>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto pb-2 sm:gap-4">
-              {topSaleProducts.map((product) => (
-                <Link
-                  key={`topsale-${product.id}`}
-                  to={`/product/${product.id}`}
-                  className="block min-w-[160px] sm:min-w-[210px] lg:min-w-[240px] flex-shrink-0"
-                >
-                  <article className="home-product-card group border border-red-100 bg-white">
-                    <div className="relative">
-                      <img
-                        src={resolveImageUrl(product.image, {
-                          width: 420,
-                          height: 260,
-                          text: product.name || 'Top Sale Product',
-                        })}
-                        alt={product.name}
-                        onError={(event) =>
-                          applyImageFallback(event, {
+            {isProductsLoading ? (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="h-44 rounded-xl border border-red-100 bg-white/80 animate-pulse" />
+                ))}
+              </div>
+            ) : topSaleProducts.length > 0 ? (
+              <div className="flex gap-3 overflow-x-auto pb-2 sm:gap-4">
+                {topSaleProducts.map((product) => (
+                  <Link
+                    key={`topsale-${product.id}`}
+                    to={`/product/${product.id}`}
+                    className="block min-w-[160px] sm:min-w-[210px] lg:min-w-[240px] flex-shrink-0"
+                  >
+                    <article className="home-product-card group border border-red-100 bg-white">
+                      <div className="relative">
+                        <img
+                          src={resolveImageUrl(product.image, {
                             width: 420,
                             height: 260,
                             text: product.name || 'Top Sale Product',
-                          })
-                        }
-                        className="h-20 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-40"
-                      />
-                      <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white sm:text-xs">
-                        {product.salePercent}% OFF
-                      </span>
-                    </div>
-                    <div className="p-1.5 sm:p-2">
-                      <h3 className="line-clamp-1 text-sm font-semibold text-gray-900 sm:text-base">
-                        {product.name}
-                      </h3>
-                      <div className="mt-1 flex items-center gap-2">
-                        <span className="text-base font-extrabold text-red-700 sm:text-lg">
-                          {formatPrice(product.price, 'INR')}
-                        </span>
-                        <span className="text-xs text-gray-500 line-through sm:text-sm">
-                          {formatPrice(product.originalPrice, 'INR')}
+                          })}
+                          alt={product.name}
+                          onError={(event) =>
+                            applyImageFallback(event, {
+                              width: 420,
+                              height: 260,
+                              text: product.name || 'Top Sale Product',
+                            })
+                          }
+                          className="h-20 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-40"
+                        />
+                        <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white sm:text-xs">
+                          {product.salePercent}% OFF
                         </span>
                       </div>
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
+                      <div className="p-1.5 sm:p-2">
+                        <h3 className="line-clamp-1 text-sm font-semibold text-gray-900 sm:text-base">
+                          {product.name}
+                        </h3>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span className="text-base font-extrabold text-red-700 sm:text-lg">
+                            {formatPrice(product.price, 'INR')}
+                          </span>
+                          <span className="text-xs text-gray-500 line-through sm:text-sm">
+                            {formatPrice(product.originalPrice, 'INR')}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-red-200 bg-white px-4 py-8 text-center">
+                <ShoppingBasket className="mx-auto h-9 w-9 text-red-500" />
+                <h3 className="mt-3 text-base font-bold text-gray-900">Products are not showing yet</h3>
+                <p className="mx-auto mt-1 max-w-xl text-sm text-gray-600">
+                  {productsError || 'Add active products in the admin panel or check the API connection.'}
+                </p>
+              </div>
+            )}
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
               {offerCards.map((card) => (
@@ -362,7 +382,9 @@ const Home = () => {
             <div className="mt-6">
               {!activeOffer || randomOfferProducts.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-gray-300 bg-white px-4 py-5 text-center text-sm text-gray-600">
-                  Click any offer card to load random 50 products.
+                  {products.length > 0
+                    ? 'Click any offer card to load random 50 products.'
+                    : 'Offer products will appear after active products are available.'}
                 </div>
               ) : (
                 <>

@@ -72,7 +72,7 @@ const Footer = () => {
           </p>
 
           <div className="flex items-center gap-3">
-            {socialLinks.map(({ label, href, icon: Icon }) => (
+            {socialLinks.map(({ label, href, icon }) => (
               <a
                 key={label}
                 href={href}
@@ -82,7 +82,7 @@ const Footer = () => {
                 aria-label={label}
                 title={label}
               >
-                <Icon className="h-4 w-4" />
+                {React.createElement(icon, { className: 'h-4 w-4' })}
               </a>
             ))}
           </div>
@@ -103,6 +103,5 @@ const Footer = () => {
 };
 
 export default Footer;
-
 
 

@@ -70,7 +70,7 @@ const Navbar = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const wishlistItems = useSelector((state) => state.wishlist.items);
 
-  const storedUser = useMemo(() => getStoredUser(), [authState.isAuthenticated, authState.user]);
+  const storedUser = getStoredUser();
 
   const currentUser = authState.user || storedUser;
   const userInitials = useMemo(() => {

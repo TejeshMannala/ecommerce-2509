@@ -24,7 +24,7 @@ import PaymentSuccessModal from '../components/payment/PaymentSuccessModal';
 import { clearCart, clearCartAsync } from '../redux/slices/cartSlice';
 import { createOrderAsync } from '../redux/slices/orderSlice';
 
-const PaymentMethodOption = ({ id, label, icon, selected, onSelect }) => (
+const PaymentMethodOption = ({ label, icon, selected, onSelect }) => (
   <button
     type="button"
     onClick={onSelect}

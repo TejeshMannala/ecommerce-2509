@@ -32,7 +32,7 @@ async function request(path, options = {}) {
       console.error('Headers sent:', headers)
       console.error('Token:', token)
     }
-  } catch (error) {
+  } catch {
     throw new Error(`Cannot connect to API server (${API_BASE_URL}). Start backend and try again.`)
   }
 

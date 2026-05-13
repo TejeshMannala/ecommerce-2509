@@ -4,7 +4,7 @@ const API_BASE_URL =
   (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
   (import.meta.env.DEV
     ? 'http://localhost:5000/api'
-    : 'https://ecommerce-api.onrender.com/api');
+    : 'https://freshbay-api.onrender.com/api');
 
 // Create axios instance
 const axiosInstance = axios.create({

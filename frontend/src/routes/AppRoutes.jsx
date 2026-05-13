@@ -1,5 +1,6 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Link, Routes, Route } from 'react-router-dom';
+import { Home as HomeIcon, Search } from 'lucide-react';
 import ProtectedRoute from './ProtectedRoute';
 import Home from '../pages/Home';
 import About from '../pages/About';
@@ -14,7 +15,33 @@ import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsOfService from '../pages/TermsOfService';
 import ContactUs from '../pages/ContactUs';
 
-const NotFound = () => <div>404 - Page Not Found</div>;
+const NotFound = () => (
+  <section className="min-h-[60vh] bg-gray-50 px-4 py-16">
+    <div className="mx-auto max-w-2xl rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+      <p className="text-sm font-semibold uppercase tracking-wide text-primary-700">404</p>
+      <h1 className="mt-2 text-3xl font-bold text-gray-900">Page not found</h1>
+      <p className="mt-3 text-gray-600">
+        The page you opened does not exist, or the link is no longer available.
+      </p>
+      <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+        <Link
+          to="/"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+        >
+          <HomeIcon className="h-4 w-4" />
+          Home
+        </Link>
+        <Link
+          to="/products"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:border-primary-300 hover:text-primary-700"
+        >
+          <Search className="h-4 w-4" />
+          Browse products
+        </Link>
+      </div>
+    </div>
+  </section>
+);
 
 const AppRoutes = () => {
   return (
