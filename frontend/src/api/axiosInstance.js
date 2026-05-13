@@ -1,10 +1,24 @@
 import axios from 'axios';
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
-  (import.meta.env.DEV
-    ? 'http://localhost:5000/api'
-    : 'https://freshbay-api.onrender.com/api');
+const PRODUCTION_API_URL = 'https://freshbay-api.onrender.com/api';
+const STALE_RENDER_API_HOSTS = [
+  'ecommerce-api.onrender.com',
+  'ecommerce-2509-server.onrender.com',
+];
+
+const resolveApiBaseUrl = () => {
+  const configuredUrl = String(import.meta.env.VITE_API_URL || '').trim();
+  const isStaleRenderUrl = STALE_RENDER_API_HOSTS.some((host) => configuredUrl.includes(host));
+  const isLocalProductionUrl = !import.meta.env.DEV && /localhost|127\.0\.0\.1/.test(configuredUrl);
+
+  if (configuredUrl && !isStaleRenderUrl && !isLocalProductionUrl) {
+    return configuredUrl;
+  }
+
+  return import.meta.env.DEV ? 'http://localhost:5000/api' : PRODUCTION_API_URL;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // Create axios instance
 const axiosInstance = axios.create({
