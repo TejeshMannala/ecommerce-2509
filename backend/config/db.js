@@ -34,7 +34,7 @@ const connectDB = async () => {
     if (/querySrv|ETIMEOUT|ECONNREFUSED|ENOTFOUND|server selection/i.test(error.message)) {
       logNetworkTroubleshooting();
     }
-    process.exit(1);
+    console.error('Proceeding with server startup despite MongoDB connection error...');
   }
 };
 

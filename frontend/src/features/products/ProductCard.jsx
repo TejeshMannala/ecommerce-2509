@@ -11,7 +11,11 @@ const ProductCard = ({
   isInCart = false,
   isInWishlist = false,
 }) => {
-  const { id, name, price, image, category, inStock, rating, reviews } = product;
+  const { id, name, price, image, images, category, inStock, rating, reviews } = product;
+  const firstImage = Array.isArray(images) ? (images.find(img => img.isPrimary)?.url || images[0]?.url || images[0]) : images;
+  const displayImage = image || firstImage;
+
+
 
   const formatPrice = (value) =>
     new Intl.NumberFormat('en-IN', {
@@ -22,7 +26,7 @@ const ProductCard = ({
 
   const averageRating = Number(rating || 4.2).toFixed(1);
   const reviewCount = Number(reviews || 120);
-  const productImageUrl = resolveImageUrl(image, {
+  const productImageUrl = resolveImageUrl(displayImage, {
     width: 640,
     height: 480,
     text: name || 'Product',

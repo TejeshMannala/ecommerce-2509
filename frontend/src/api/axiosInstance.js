@@ -15,7 +15,7 @@ const resolveApiBaseUrl = () => {
     return configuredUrl;
   }
 
-  return import.meta.env.DEV ? 'http://localhost:5000/api' : PRODUCTION_API_URL;
+  return import.meta.env.DEV ? 'http://localhost:5001/api' : PRODUCTION_API_URL;
 };
 
 const API_BASE_URL = resolveApiBaseUrl();

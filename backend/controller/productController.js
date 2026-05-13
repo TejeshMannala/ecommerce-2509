@@ -281,7 +281,9 @@ const searchProducts = async (req, res) => {
 
 const getProductCategories = async (req, res) => {
   try {
+    console.log('Fetching distinct categories...');
     const categories = await Product.distinct('category', { isDeleted: false });
+    console.log('Categories fetched:', categories);
     return res.status(200).json({ categories });
   } catch (error) {
     console.error('Get product categories error:', error);

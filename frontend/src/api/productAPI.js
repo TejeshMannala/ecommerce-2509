@@ -19,9 +19,14 @@ const normalizeProduct = (product = {}) => {
     name: product?.name || 'Product',
     description: product?.description || '',
     category: product?.category || 'General',
-    image: product?.images?.[0]?.url || '/api/placeholder/100/100',
+    image:
+      product?.image ||
+      (Array.isArray(product?.images)
+        ? product.images[0]?.url || (typeof product.images[0] === 'string' ? product.images[0] : '')
+        : '') ||
+      '/api/placeholder/100/100',
     images: Array.isArray(product?.images)
-      ? product.images.map((img) => img?.url).filter(Boolean)
+      ? product.images.map((img) => (typeof img === 'string' ? img : img?.url)).filter(Boolean)
       : [],
     price,
     discount: discountPercentage,
