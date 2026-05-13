@@ -110,7 +110,13 @@ const getProducts = async (req, res) => {
     }
 
     if (category) query.category = category;
-    if (status) query.status = status;
+    if (status) {
+      if (status === 'active') {
+        query.$or = [{ status: 'active' }, { status: { $exists: false } }];
+      } else {
+        query.status = status;
+      }
+    }
     if (isFeatured !== undefined) query.isFeatured = toBoolean(isFeatured);
 
     if (search) {
@@ -166,13 +172,20 @@ const getProducts = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
-    const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc' } = req.query;
+    const { page = 1, limit = 20, sortBy = 'createdAt', order = 'desc', status } = req.query;
 
     const parsedPage = Math.max(1, parseInt(page, 10) || 1);
     const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
     const sortDirection = String(order).toLowerCase() === 'asc' ? 1 : -1;
 
     const query = { category, isDeleted: false };
+    if (status) {
+      if (status === 'active') {
+        query.$or = [{ status: 'active' }, { status: { $exists: false } }];
+      } else {
+        query.status = status;
+      }
+    }
     const [products, total] = await Promise.all([
       Product.find(query)
         .sort({ [sortBy]: sortDirection })

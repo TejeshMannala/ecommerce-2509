@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const { getJwtSecret } = require('../config/env');
+
+const getJwtSecret = () => String(process.env.JWT_SECRET || '').trim();
 
 const buildAuthResponse = (user) => ({
   id: user._id,
@@ -43,7 +44,6 @@ const registerUser = async (req, res) => {
       name: String(name).trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      confirmpassword: hashedPassword,
     });
 
     const token = generateToken(user._id);

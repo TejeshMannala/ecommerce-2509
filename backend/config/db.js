@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { getMongoUri } = require('./env');
 
 const logAuthTroubleshooting = () => {
   console.error('MongoDB auth troubleshooting:');
@@ -9,8 +8,16 @@ const logAuthTroubleshooting = () => {
   console.error('4) Ensure your current IP is allowed in Atlas Network Access.');
 };
 
+const logNetworkTroubleshooting = () => {
+  console.error('MongoDB network troubleshooting:');
+  console.error('1) Your mongodb+srv URI requires Node to resolve Atlas SRV DNS records.');
+  console.error('2) Check that your DNS server can resolve _mongodb._tcp.<cluster>.mongodb.net.');
+  console.error('3) Ensure your current IP is allowed in Atlas Network Access.');
+  console.error('4) Ensure your firewall/VPN/ISP allows outbound TCP traffic on port 27017.');
+};
+
 const connectDB = async () => {
-  const mongoUri = getMongoUri();
+  const mongoUri = String(process.env.MONGO_URI || '').trim();
 
   if (!mongoUri) {
     throw new Error('MONGO_URI is not set in .env');
@@ -23,6 +30,9 @@ const connectDB = async () => {
     console.error(`MongoDB connection error: ${error.message}`);
     if (error.code === 8000 || /bad auth/i.test(error.message)) {
       logAuthTroubleshooting();
+    }
+    if (/querySrv|ETIMEOUT|ECONNREFUSED|ENOTFOUND|server selection/i.test(error.message)) {
+      logNetworkTroubleshooting();
     }
     process.exit(1);
   }

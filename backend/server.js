@@ -6,7 +6,6 @@ const path = require('path');
 dotenv.config();
 
 const connectDB = require('./config/db');
-const { isProduction, assertRequiredEnv } = require('./config/env');
 const authRoutes = require('./routes/authRoutes');
 const adminAuthRoutes = require('./admin/routes/adminAuthRoutes');
 const adminCategoryRoutes = require('./admin/routes/adminCategoryRoutes');
@@ -29,6 +28,28 @@ require('./models/Cart');
 require('./models/Wishlist');
 require('./models/Order');
 require('./admin/models/SupportMessage');
+
+const isProduction = () => process.env.NODE_ENV === 'production';
+
+const assertRequiredEnv = () => {
+  const missing = [];
+
+  if (!String(process.env.MONGO_URI || '').trim()) {
+    missing.push('MONGO_URI');
+  }
+
+  if (!String(process.env.JWT_SECRET || '').trim()) {
+    missing.push('JWT_SECRET');
+  }
+
+  if (missing.length) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+
+  if (isProduction() && process.env.JWT_SECRET === 'dev-secret-change-me') {
+    throw new Error('JWT_SECRET cannot use the development default in production');
+  }
+};
 
 assertRequiredEnv();
 
@@ -133,8 +154,6 @@ const startServer = async () => {
     const jwtSecret = process.env.JWT_SECRET;
     
     console.log(`Server starting on port ${PORT}`);
-    console.log(`JWT Secret loaded: ${jwtSecret ? 'SECRET_PROVIDED' : 'MISSING'}`);
-    console.log(`JWT Secret length: ${jwtSecret ? jwtSecret.length : 0}`);
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

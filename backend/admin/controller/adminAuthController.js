@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Admin = require('../models/Admin');
-const { getJwtSecret } = require('../../config/env');
+
+const getJwtSecret = () => String(process.env.JWT_SECRET || '').trim();
 
 const buildAdminAuthResponse = (admin) => ({
   id: admin._id,

@@ -126,10 +126,8 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: {
-        values: ['active', 'inactive', 'discontinued'],
-        default: 'active',
-      },
+      enum: ['active', 'inactive', 'discontinued'],
+      default: 'active',
       index: true,
     },
     tags: [

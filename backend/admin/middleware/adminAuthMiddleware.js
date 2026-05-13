@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
-const { getJwtSecret } = require('../../config/env');
+
+const getJwtSecret = () => String(process.env.JWT_SECRET || '').trim();
 
 const protectAdmin = async (req, res, next) => {
   try {
