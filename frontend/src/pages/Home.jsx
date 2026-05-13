@@ -207,9 +207,11 @@ const Home = () => {
 
   useEffect(() => {
     let isMounted = true;
+    console.log('Fetching products from:', productAPI.getProducts);
     productAPI
       .getProducts({ limit: 200, status: 'active' })
       .then((response) => {
+        console.log('Products API response:', response);
         if (isMounted) {
           const normalizedProducts = (Array.isArray(response?.products) ? response.products : []).map(
             (product) => ({
@@ -221,10 +223,12 @@ const Home = () => {
                 (typeof product.images?.[0] === 'string' ? product.images[0] : ''),
             })
           );
+          console.log('Normalized products:', normalizedProducts);
           setProducts(normalizedProducts);
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Failed to fetch products:', error);
         if (isMounted) {
           setProducts([]);
         }
