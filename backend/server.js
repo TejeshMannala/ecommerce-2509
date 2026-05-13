@@ -93,11 +93,15 @@ if (trustProxyValue !== undefined) {
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
-      }
+      if (!origin) return callback(null, true);
+      
+      const isAllowed = 
+        allowedOrigins.includes('*') || 
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.onrender.com') ||
+        origin.includes('localhost');
 
-      if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      if (isAllowed) {
         return callback(null, true);
       }
 

@@ -22,6 +22,7 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log(`API CALL: ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
