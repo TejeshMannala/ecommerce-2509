@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ecommerce-api
+    name: freshbay-api
     env: node
     rootDir: backend
     buildCommand: npm ci
@@ -18,10 +18,10 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://freshbay.onrender.com,https://ecommerce-admin.onrender.com
+        value: https://freshbay.onrender.com,https://freshbay-admin.onrender.com
 
   - type: static
-    name: ecommerce-frontend
+    name: freshbay
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
@@ -31,11 +31,11 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://ecommerce-api.onrender.com/api
+        value: https://freshbay-api.onrender.com/api
 
   - type: static
-    name: ecommerce-admin
-    rootDir: admin-frontend
+    name: freshbay-admin
+    rootDir: admin
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
     routes:
@@ -44,4 +44,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_ADMIN_API_URL
-        value: https://ecommerce-2509-server.onrender.com/api
+        value: https://freshbay-api.onrender.com/api
