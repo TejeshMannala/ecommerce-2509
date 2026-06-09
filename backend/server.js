@@ -80,7 +80,7 @@ const allowedOrigins = explicitOrigins.length
   : defaultAllowedOrigins;
 
 if (isProduction() && explicitOrigins.length === 0) {
-  throw new Error('Set CORS_ORIGINS (or FRONTEND_URL/ADMIN_FRONTEND_URL) in production');
+  console.warn('WARNING: CORS_ORIGINS is not set. Using default allowed origins.');
 }
 
 const trustProxyValue = process.env.TRUST_PROXY;
