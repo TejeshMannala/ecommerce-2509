@@ -82,24 +82,10 @@ if (isProduction() && explicitOrigins.length === 0) {
 }
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-
-    const isAllowed =
-      allowedOrigins.includes('*') ||
-      allowedOrigins.includes(origin) ||
-      origin.endsWith('.onrender.com') ||
-      origin.includes('localhost');
-
-    if (isAllowed) {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
 };
 
 const app = express();
