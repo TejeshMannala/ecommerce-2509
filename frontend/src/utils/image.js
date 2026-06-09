@@ -21,26 +21,47 @@ const escapeForSvg = (value) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+const gradients = [
+  ['#FCA5A5', '#EF4444'], // Red
+  ['#FDBA74', '#F97316'], // Orange
+  ['#FCD34D', '#F59E0B'], // Amber
+  ['#86EFAC', '#22C55E'], // Green
+  ['#93C5FD', '#3B82F6'], // Blue
+  ['#C4B5FD', '#8B5CF6'], // Violet
+  ['#F9A8D4', '#EC4899'], // Pink
+  ['#E2E8F0', '#94A3B8'], // Slate
+];
+
+const getGradientForText = (text) => {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = text.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % gradients.length;
+  return gradients[index];
+};
+
 const API_ORIGIN = getApiOrigin(API_BASE_URL);
 
 const buildPlaceholderUrl = (width, height, text) => {
   const safeText = escapeForSvg(text).slice(0, 60);
+  const [color1, color2] = getGradientForText(text);
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
       <defs>
         <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#E2E8F0" />
-          <stop offset="100%" stop-color="#CBD5E1" />
+          <stop offset="0%" stop-color="${color1}" />
+          <stop offset="100%" stop-color="${color2}" />
         </linearGradient>
       </defs>
       <rect width="${width}" height="${height}" fill="url(#bg)" />
       <text
         x="50%"
         y="50%"
-        fill="#334155"
+        fill="#FFFFFF"
         font-family="Inter, Arial, sans-serif"
-        font-size="20"
-        font-weight="600"
+        font-size="24"
+        font-weight="700"
         text-anchor="middle"
         dominant-baseline="middle"
       >
@@ -67,10 +88,6 @@ export const resolveImageUrl = (imageUrl, options = {}) => {
 
   const trimmed = imageUrl.trim();
   if (!trimmed) {
-    return fallback;
-  }
-
-  if (/dummyimage\.com/i.test(trimmed)) {
     return fallback;
   }
 
