@@ -53,8 +53,6 @@ const assertRequiredEnv = () => {
 
 assertRequiredEnv();
 
-const app = express();
-
 const parseCorsOrigins = (value) =>
   String(value || '')
     .split(',')
@@ -83,6 +81,29 @@ if (isProduction() && explicitOrigins.length === 0) {
   console.warn('WARNING: CORS_ORIGINS is not set. Using default allowed origins.');
 }
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    const isAllowed =
+      allowedOrigins.includes('*') ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.onrender.com') ||
+      origin.includes('localhost');
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+const app = express();
+
 const trustProxyValue = process.env.TRUST_PROXY;
 if (trustProxyValue !== undefined) {
   const trimmed = String(trustProxyValue).trim().toLowerCase();
@@ -97,29 +118,8 @@ if (trustProxyValue !== undefined) {
   app.set('trust proxy', 1);
 }
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      
-      const isAllowed = 
-        allowedOrigins.includes('*') || 
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.onrender.com') ||
-        origin.includes('localhost');
-
-      if (isAllowed) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-app.options(/.*/, cors());
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
@@ -129,7 +129,12 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({
+    status: 'ok',
+    service: 'freshbay-api',
+    database: 'connected',
+    allowedOrigins,
+  });
 });
 
 app.get('/', (req, res) => {

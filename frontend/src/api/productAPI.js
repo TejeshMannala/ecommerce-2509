@@ -1,5 +1,6 @@
 import axiosInstance from './axiosInstance';
 import { PRODUCT_CATEGORIES } from '../utils/constants';
+import { productCatalog } from '../features/products/productCatalog';
 
 const MIN_PRODUCT_PRICE = 50;
 const MAX_PRODUCT_PRICE = 200;
@@ -44,45 +45,134 @@ const normalizeProduct = (product = {}) => {
 
 const normalizeProducts = (products = []) => products.map(normalizeProduct).filter((p) => p.id);
 
+const normalizeText = (value = '') => String(value).toLowerCase().trim();
+
+const getFallbackProducts = (params = {}) => {
+  const page = Math.max(1, Number(params.page || 1));
+  const limit = Math.max(1, Number(params.limit || productCatalog.length));
+  const search = normalizeText(params.search || params.q);
+  const category = String(params.category || '').trim();
+  const status = String(params.status || '').trim();
+
+  let products = productCatalog;
+
+  if (category) {
+    products = products.filter((product) => product.category === category);
+  }
+
+  if (search) {
+    products = products.filter((product) => {
+      const searchable = normalizeText(
+        `${product.name || ''} ${product.category || ''} ${product.description || ''}`
+      );
+      return searchable.includes(search);
+    });
+  }
+
+  if (status === 'active') {
+    products = products.filter((product) => product.inStock !== false);
+  }
+
+  const total = products.length;
+  const start = (page - 1) * limit;
+  const paginatedProducts = products.slice(start, start + limit);
+
+  return {
+    products: normalizeProducts(paginatedProducts),
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+    },
+    source: 'fallback',
+  };
+};
+
+const shouldUseFallbackProducts = (error) =>
+  !error?.response || error.response.status === 404 || error.response.status >= 500;
+
+const warnFallback = (error) => {
+  console.warn(
+    'Product API unavailable; showing bundled catalog fallback.',
+    error?.response?.data?.message || error?.message || error
+  );
+};
+
 export const productAPI = {
   // Get all products
   getProducts: async (params = {}) => {
-    const response = await axiosInstance.get('/products', { params });
-    const data = response.data || {};
-    return {
-      products: normalizeProducts(data?.products || []),
-      pagination: data?.pagination || null,
-    };
+    try {
+      const response = await axiosInstance.get('/products', { params });
+      const data = response.data || {};
+      return {
+        products: normalizeProducts(data?.products || []),
+        pagination: data?.pagination || null,
+      };
+    } catch (error) {
+      if (shouldUseFallbackProducts(error)) {
+        warnFallback(error);
+        return getFallbackProducts(params);
+      }
+      throw error;
+    }
   },
 
   // Get product by ID
   getProductById: async (id) => {
-    const response = await axiosInstance.get(`/products/${id}`);
-    return {
-      product: normalizeProduct(response?.data?.product || {}),
-    };
+    try {
+      const response = await axiosInstance.get(`/products/${id}`);
+      return {
+        product: normalizeProduct(response?.data?.product || {}),
+      };
+    } catch (error) {
+      if (shouldUseFallbackProducts(error)) {
+        warnFallback(error);
+        const fallbackProduct = productCatalog.find((product) => String(product.id) === String(id));
+        if (fallbackProduct) {
+          return { product: normalizeProduct(fallbackProduct), source: 'fallback' };
+        }
+      }
+      throw error;
+    }
   },
 
   // Get products by category
   getProductsByCategory: async (category, params = {}) => {
-    const response = await axiosInstance.get(`/products/category/${category}`, { params });
-    const data = response.data || {};
-    return {
-      products: normalizeProducts(data?.products || []),
-      pagination: data?.pagination || null,
-    };
+    try {
+      const response = await axiosInstance.get(`/products/category/${category}`, { params });
+      const data = response.data || {};
+      return {
+        products: normalizeProducts(data?.products || []),
+        pagination: data?.pagination || null,
+      };
+    } catch (error) {
+      if (shouldUseFallbackProducts(error)) {
+        warnFallback(error);
+        return getFallbackProducts({ ...params, category });
+      }
+      throw error;
+    }
   },
 
   // Search products
   searchProducts: async (query, params = {}) => {
-    const response = await axiosInstance.get('/products/search', { 
-      params: { q: query, ...params } 
-    });
-    const data = response.data || {};
-    return {
-      products: normalizeProducts(data?.products || []),
-      pagination: data?.pagination || null,
-    };
+    try {
+      const response = await axiosInstance.get('/products/search', { 
+        params: { q: query, ...params } 
+      });
+      const data = response.data || {};
+      return {
+        products: normalizeProducts(data?.products || []),
+        pagination: data?.pagination || null,
+      };
+    } catch (error) {
+      if (shouldUseFallbackProducts(error)) {
+        warnFallback(error);
+        return getFallbackProducts({ ...params, q: query });
+      }
+      throw error;
+    }
   },
 
 
