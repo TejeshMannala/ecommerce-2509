@@ -24,14 +24,14 @@ const escapeForSvg = (value) =>
 const API_ORIGIN = getApiOrigin(API_BASE_URL);
 
 const gradients = [
-  ['#FCA5A5', '#EF4444'], // Red
-  ['#FDBA74', '#F97316'], // Orange
-  ['#FCD34D', '#F59E0B'], // Amber
-  ['#86EFAC', '#22C55E'], // Green
-  ['#93C5FD', '#3B82F6'], // Blue
-  ['#C4B5FD', '#8B5CF6'], // Violet
-  ['#F9A8D4', '#EC4899'], // Pink
-  ['#E2E8F0', '#94A3B8'], // Slate
+  ['#FCA5A5', '#EF4444'],
+  ['#FDBA74', '#F97316'],
+  ['#FCD34D', '#F59E0B'],
+  ['#86EFAC', '#22C55E'],
+  ['#93C5FD', '#3B82F6'],
+  ['#C4B5FD', '#8B5CF6'],
+  ['#F9A8D4', '#EC4899'],
+  ['#E2E8F0', '#94A3B8'],
 ];
 
 const getGradientForText = (text) => {
@@ -45,32 +45,25 @@ const getGradientForText = (text) => {
 
 const buildPlaceholderUrl = (width, height, text) => {
   const safeText = escapeForSvg(text).slice(0, 60);
-  const [color1, color2] = getGradientForText(text);
-  const svg = \`
-    <svg xmlns="http://www.w3.org/2000/svg" width="\${width}" height="\${height}" viewBox="0 0 \${width} \${height}">
-      <defs>
-        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="\${color1}" />
-          <stop offset="100%" stop-color="\${color2}" />
-        </linearGradient>
-      </defs>
-      <rect width="\${width}" height="\${height}" fill="url(#bg)" />
-      <text
-        x="50%"
-        y="50%"
-        fill="#FFFFFF"
-        font-family="Inter, Arial, sans-serif"
-        font-size="24"
-        font-weight="700"
-        text-anchor="middle"
-        dominant-baseline="middle"
-      >
-        \${safeText}
-      </text>
-    </svg>
-  \`;
-
-  return \`data:image/svg+xml;charset=UTF-8,\${encodeURIComponent(svg)}\`;
+  const colors = getGradientForText(text);
+  const color1 = colors[0];
+  const color2 = colors[1];
+  const parts = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">',
+    '<defs>',
+    '<linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">',
+    '<stop offset="0%" stop-color="' + color1 + '" />',
+    '<stop offset="100%" stop-color="' + color2 + '" />',
+    '</linearGradient>',
+    '</defs>',
+    '<rect width="' + width + '" height="' + height + '" fill="url(#bg)" />',
+    '<text x="50%" y="50%" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="middle">',
+    safeText,
+    '</text>',
+    '</svg>',
+  ];
+  const svg = parts.join('');
+  return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
 };
 
 export const getFallbackImageUrl = (options = {}) => {
@@ -97,23 +90,24 @@ export const resolveImageUrl = (imageUrl, options = {}) => {
 
   const placeholderMatch = trimmed.match(/^\/api\/placeholder\/(\d+)\/(\d+)$/);
   if (placeholderMatch) {
-    const [, matchWidth, matchHeight] = placeholderMatch;
+    const matchWidth = placeholderMatch[1];
+    const matchHeight = placeholderMatch[2];
     return buildPlaceholderUrl(matchWidth, matchHeight, text);
   }
 
   if (trimmed.startsWith('/uploads/') || trimmed.startsWith('uploads/')) {
-    return `${API_ORIGIN}/${trimmed.replace(/^\/+/, '')}`;
+    return API_ORIGIN + '/' + trimmed.replace(/^\/+/, '');
   }
 
   if (trimmed.startsWith('/api/')) {
-    return `${API_ORIGIN}${trimmed}`;
+    return API_ORIGIN + trimmed;
   }
 
   if (trimmed.startsWith('/')) {
     return trimmed;
   }
 
-  return `${API_ORIGIN}/${trimmed}`;
+  return API_ORIGIN + '/' + trimmed;
 };
 
 export const applyImageFallback = (event, options = {}) => {
