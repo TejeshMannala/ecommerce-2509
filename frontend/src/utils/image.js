@@ -23,9 +23,54 @@ const escapeForSvg = (value) =>
 
 const API_ORIGIN = getApiOrigin(API_BASE_URL);
 
+const gradients = [
+  ['#FCA5A5', '#EF4444'], // Red
+  ['#FDBA74', '#F97316'], // Orange
+  ['#FCD34D', '#F59E0B'], // Amber
+  ['#86EFAC', '#22C55E'], // Green
+  ['#93C5FD', '#3B82F6'], // Blue
+  ['#C4B5FD', '#8B5CF6'], // Violet
+  ['#F9A8D4', '#EC4899'], // Pink
+  ['#E2E8F0', '#94A3B8'], // Slate
+];
+
+const getGradientForText = (text) => {
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = text.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % gradients.length;
+  return gradients[index];
+};
+
 const buildPlaceholderUrl = (width, height, text) => {
-  const safeText = encodeURIComponent(text.trim() || 'product');
-  return `https://loremflickr.com/${width}/${height}/${safeText}`;
+  const safeText = escapeForSvg(text).slice(0, 60);
+  const [color1, color2] = getGradientForText(text);
+  const svg = \`
+    <svg xmlns="http://www.w3.org/2000/svg" width="\${width}" height="\${height}" viewBox="0 0 \${width} \${height}">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="\${color1}" />
+          <stop offset="100%" stop-color="\${color2}" />
+        </linearGradient>
+      </defs>
+      <rect width="\${width}" height="\${height}" fill="url(#bg)" />
+      <text
+        x="50%"
+        y="50%"
+        fill="#FFFFFF"
+        font-family="Inter, Arial, sans-serif"
+        font-size="24"
+        font-weight="700"
+        text-anchor="middle"
+        dominant-baseline="middle"
+      >
+        \${safeText}
+      </text>
+    </svg>
+  \`;
+
+  return \`data:image/svg+xml;charset=UTF-8,\${encodeURIComponent(svg)}\`;
 };
 
 export const getFallbackImageUrl = (options = {}) => {
@@ -73,6 +118,9 @@ export const resolveImageUrl = (imageUrl, options = {}) => {
 
 export const applyImageFallback = (event, options = {}) => {
   const imageElement = event.currentTarget;
-  imageElement.onerror = null;
-  imageElement.src = getFallbackImageUrl(options);
+  const fallbackUrl = getFallbackImageUrl(options);
+  if (imageElement.src !== fallbackUrl) {
+    imageElement.onerror = null;
+    imageElement.src = fallbackUrl;
+  }
 };
