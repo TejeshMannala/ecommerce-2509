@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const PRODUCTION_API_URL = 'https://freshbay-api.onrender.com/api';
+const PRODUCTION_API_URL = 'https://ecommerce-2509-server.onrender.com/api';
 const STALE_RENDER_API_HOSTS = [
   'ecommerce-api.onrender.com',
-  'ecommerce-2509-server.onrender.com',
+  'freshbay-api.onrender.com',
 ];
 
 const resolveApiBaseUrl = () => {
