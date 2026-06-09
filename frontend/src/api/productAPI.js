@@ -4,6 +4,9 @@ import { productCatalog } from '../features/products/productCatalog';
 
 const MIN_PRODUCT_PRICE = 50;
 const MAX_PRODUCT_PRICE = 200;
+const USE_BUNDLED_CATALOG =
+  import.meta.env.VITE_USE_BUNDLED_CATALOG === 'true' ||
+  (!import.meta.env.DEV && import.meta.env.VITE_USE_LIVE_PRODUCTS !== 'true');
 const clampPrice = (value) =>
   Math.min(MAX_PRODUCT_PRICE, Math.max(MIN_PRODUCT_PRICE, Number(value || 0)));
 
@@ -102,6 +105,10 @@ const warnFallback = (error) => {
 export const productAPI = {
   // Get all products
   getProducts: async (params = {}) => {
+    if (USE_BUNDLED_CATALOG) {
+      return getFallbackProducts(params);
+    }
+
     try {
       const response = await axiosInstance.get('/products', { params });
       const data = response.data || {};
@@ -120,6 +127,13 @@ export const productAPI = {
 
   // Get product by ID
   getProductById: async (id) => {
+    if (USE_BUNDLED_CATALOG) {
+      const fallbackProduct = productCatalog.find((product) => String(product.id) === String(id));
+      if (fallbackProduct) {
+        return { product: normalizeProduct(fallbackProduct), source: 'fallback' };
+      }
+    }
+
     try {
       const response = await axiosInstance.get(`/products/${id}`);
       return {
@@ -139,6 +153,10 @@ export const productAPI = {
 
   // Get products by category
   getProductsByCategory: async (category, params = {}) => {
+    if (USE_BUNDLED_CATALOG) {
+      return getFallbackProducts({ ...params, category });
+    }
+
     try {
       const response = await axiosInstance.get(`/products/category/${category}`, { params });
       const data = response.data || {};
@@ -157,6 +175,10 @@ export const productAPI = {
 
   // Search products
   searchProducts: async (query, params = {}) => {
+    if (USE_BUNDLED_CATALOG) {
+      return getFallbackProducts({ ...params, q: query });
+    }
+
     try {
       const response = await axiosInstance.get('/products/search', { 
         params: { q: query, ...params } 
@@ -180,6 +202,10 @@ export const productAPI = {
 
   // Get categories
   getCategories: async () => {
+    if (USE_BUNDLED_CATALOG) {
+      return PRODUCT_CATEGORIES;
+    }
+
     try {
       const response = await axiosInstance.get('/products/categories');
       const data = response.data;

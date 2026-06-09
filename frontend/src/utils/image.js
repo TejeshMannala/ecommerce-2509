@@ -1,6 +1,6 @@
 const API_BASE_URL =
   (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
-  (import.meta.env.DEV ? 'http://localhost:5001/api' : '/api');
+  (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const getApiOrigin = (apiUrl) => {
   try {
@@ -9,7 +9,7 @@ const getApiOrigin = (apiUrl) => {
     if (typeof window !== 'undefined' && window.location?.origin) {
       return window.location.origin;
     }
-    return 'http://localhost:5001';
+    return 'http://localhost:5000';
   }
 };
 
@@ -67,6 +67,10 @@ export const resolveImageUrl = (imageUrl, options = {}) => {
 
   const trimmed = imageUrl.trim();
   if (!trimmed) {
+    return fallback;
+  }
+
+  if (/dummyimage\.com/i.test(trimmed)) {
     return fallback;
   }
 
