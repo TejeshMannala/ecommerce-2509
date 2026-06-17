@@ -7,9 +7,9 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 const Admin = require('./admin/models/Admin');
 
 const DEFAULT_ADMIN = {
-  loginUserName: 'admin',
+  loginUserName: String(process.env.ADMIN_LOGIN || 'admin').trim(),
   name: 'Admin',
-  password: 'admin123',
+  password: String(process.env.ADMIN_PASSWORD || 'admin123').trim(),
 };
 
 const seedAdmin = async () => {
