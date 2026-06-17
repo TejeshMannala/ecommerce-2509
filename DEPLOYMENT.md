@@ -31,7 +31,7 @@ Build/publish:
 ## 3) Admin static site (`freshbay-admin`)
 Set:
 
-- `VITE_ADMIN_API_URL=https://freshbay-api.onrender.com/api`
+- `VITE_ADMIN_API_URL=https://ecommerce-2509-server.onrender.com/api`
 
 Build/publish:
 
