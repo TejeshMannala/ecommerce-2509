@@ -200,6 +200,54 @@ export const productAPI = {
 
 
 
+  // Get reviews for a product
+  getProductReviews: async (productId, params = {}) => {
+    try {
+      const response = await axiosInstance.get(`/reviews/${productId}`, { params });
+      return response.data;
+    } catch {
+      return { reviews: [], pagination: { total: 0, page: 1, limit: 10, totalPages: 0 }, ratingBreakdown: {} };
+    }
+  },
+
+  // Get current user's review for a product
+  getUserReviewForProduct: async (productId) => {
+    try {
+      const response = await axiosInstance.get(`/reviews/${productId}/user-review`);
+      return response.data.review || null;
+    } catch {
+      return null;
+    }
+  },
+
+  // Check if user can review this product
+  checkCanReview: async (productId) => {
+    try {
+      const response = await axiosInstance.get(`/reviews/${productId}/can-review`);
+      return response.data;
+    } catch {
+      return { canReview: false, reason: 'error' };
+    }
+  },
+
+  // Create a review
+  createReview: async (productId, data) => {
+    const response = await axiosInstance.post(`/reviews/${productId}`, data);
+    return response.data;
+  },
+
+  // Update a review
+  updateReview: async (reviewId, data) => {
+    const response = await axiosInstance.put(`/reviews/${reviewId}`, data);
+    return response.data;
+  },
+
+  // Delete a review
+  deleteReview: async (reviewId) => {
+    const response = await axiosInstance.delete(`/reviews/${reviewId}`);
+    return response.data;
+  },
+
   // Get categories
   getCategories: async () => {
     if (USE_BUNDLED_CATALOG) {
