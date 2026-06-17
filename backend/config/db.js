@@ -26,8 +26,28 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(mongoUri);
     console.log(`MongoDB connected: ${conn.connection.host}`);
+    return;
   } catch (error) {
     console.error(`MongoDB connection error: ${error.message}`);
+
+    if (/querySrv/i.test(error.message)) {
+      const directFallback = process.env.MONGO_URI_DIRECT;
+      if (directFallback) {
+        console.warn('MongoDB SRV resolution failed, attempting direct URI fallback.');
+        try {
+          const conn = await mongoose.connect(directFallback);
+          console.log(`MongoDB connected with direct fallback: ${conn.connection.host}`);
+          return;
+        } catch (fallbackError) {
+          error = fallbackError;
+          console.error(`MongoDB direct fallback error: ${fallbackError.message}`);
+        }
+      } else {
+        console.warn('MongoDB SRV resolution failed and no MONGO_URI_DIRECT fallback set.');
+        console.warn('Tip: Set MONGO_URI_DIRECT in .env with a non-SRV connection string from Atlas.');
+      }
+    }
+
     if (error.code === 8000 || /bad auth/i.test(error.message)) {
       logAuthTroubleshooting();
     }
