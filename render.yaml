@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: freshbay-api
+    name: ecommerce-2509-server
     env: node
     rootDir: backend
     buildCommand: npm ci

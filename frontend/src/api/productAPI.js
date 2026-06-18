@@ -4,9 +4,11 @@ import { productCatalog } from '../features/products/productCatalog';
 
 const MIN_PRODUCT_PRICE = 50;
 const MAX_PRODUCT_PRICE = 200;
-const USE_BUNDLED_CATALOG =
-  import.meta.env.VITE_USE_BUNDLED_CATALOG === 'true' ||
-  (!import.meta.env.DEV && import.meta.env.VITE_USE_LIVE_PRODUCTS !== 'true');
+// Use the live API by default (dev and production). The bundled sample catalog
+// is only used when explicitly opted in via VITE_USE_BUNDLED_CATALOG=true. If
+// the live API is unreachable, the per-request error handlers below still fall
+// back to the bundled catalog so the storefront keeps working.
+const USE_BUNDLED_CATALOG = import.meta.env.VITE_USE_BUNDLED_CATALOG === 'true';
 const clampPrice = (value) =>
   Math.min(MAX_PRODUCT_PRICE, Math.max(MIN_PRODUCT_PRICE, Number(value || 0)));
 
