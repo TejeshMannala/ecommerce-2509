@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const PRODUCTION_API_URL = 'https://ecommerce-2509-server.onrender.com/api';
 const STALE_RENDER_API_HOSTS = [
@@ -50,28 +51,37 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
-      const requestUrl = String(error.config?.url || '');
-      const isAuthEndpoint =
-        requestUrl.includes('/auth/login') ||
-        requestUrl.includes('/auth/register') ||
-        requestUrl.includes('/auth/refresh');
-      const hadAuthToken =
-        Boolean(error.config?._hadAuthToken) || Boolean(error.config?.headers?.Authorization);
+    // Network/CORS Errors
+    if (!error.response) {
+      toast.error('Network error or CORS issue. Please check your connection.');
+      return Promise.reject(error);
+    }
 
-      // Redirect only for expired/invalid authenticated sessions, not for login/register failures.
+    const { status } = error.response;
+    const requestUrl = String(error.config?.url || '');
+    const isAuthEndpoint =
+      requestUrl.includes('/auth/login') ||
+      requestUrl.includes('/auth/register') ||
+      requestUrl.includes('/auth/refresh');
+    
+    if (status === 401) {
+      const hadAuthToken = Boolean(error.config?._hadAuthToken) || Boolean(error.config?.headers?.Authorization);
       if (!isAuthEndpoint && hadAuthToken) {
         const currentPath = window.location.pathname;
         const isAlreadyOnAuthPage = currentPath === '/login' || currentPath === '/register';
-
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-
-        if (!isAlreadyOnAuthPage) {
-          window.location.replace('/login');
-        }
+        toast.error('Session expired. Please log in again.');
+        if (!isAlreadyOnAuthPage) window.location.replace('/login');
       }
+    } else if (status === 403) {
+      toast.error('You do not have permission to perform this action.');
+    } else if (status === 404) {
+      toast.error('The requested resource was not found.');
+    } else if (status >= 500) {
+      toast.error('Internal server error. Please try again later.');
     }
+
     return Promise.reject(error);
   }
 );

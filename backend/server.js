@@ -36,6 +36,7 @@ if (process.env.TRUST_PROXY === "1") {
 const defaultOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "http://localhost:3000",
   "https://freshbay.onrender.com",
 ];
 
@@ -67,6 +68,8 @@ app.use(
       );
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
   })
 );
 
@@ -137,13 +140,27 @@ app.use("/api/admin-auth", adminAuthRoutes);
 app.use("/api/admin", adminRoutes);
 
 /* ========================
+   404 HANDLER
+======================== */
+app.use((req, res, next) => {
+  res.status(404).json({ message: `Cannot ${req.method} ${req.originalUrl}` });
+});
+
+/* ========================
    ERROR HANDLER
 ======================== */
 app.use((err, req, res, next) => {
-  console.error("❌ Error:", err);
+  console.error("❌ Error encountered:");
+  console.error("URL:", req.originalUrl);
+  console.error("Method:", req.method);
+  console.error("Headers:", req.headers);
+  console.error("Body:", req.body);
+  if (req.user) console.error("User:", req.user._id);
+  console.error("Stack Trace:", err.stack);
 
-  res.status(err.status || 500).json({
+  res.status(err.status || err.statusCode || 500).json({
     message: err.message || "Internal Server Error",
+    success: false,
   });
 });
 
