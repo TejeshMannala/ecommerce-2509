@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 dotenv.config();
 console.log("🔍 Environment Check:");
@@ -35,6 +36,7 @@ if (process.env.TRUST_PROXY === "1") {
 const defaultOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://freshbay.onrender.com",
 ];
 
 const allowedOrigins = process.env.CORS_ORIGINS
@@ -69,10 +71,22 @@ app.use(
 );
 
 /* ========================
-   BODY PARSERS
+   BODY PARSERS & COOKIES
 ======================== */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+/* ========================
+   REQUEST LOGGING
+======================== */
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  console.log("Params:", req.params);
+  console.log("Query:", req.query);
+  if (req.user) console.log("User:", req.user._id);
+  next();
+});
 
 /* ========================
    STATIC FILES

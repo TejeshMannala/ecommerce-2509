@@ -4,31 +4,40 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 
 const recalculateProductRating = async (productId) => {
-  const result = await Review.aggregate([
-    { $match: { product: new mongoose.Types.ObjectId(productId), status: 'approved' } },
-    {
-      $group: {
-        _id: '$product',
-        average: { $avg: '$rating' },
-        count: { $sum: 1 },
+  try {
+    const result = await Review.aggregate([
+      { $match: { product: new mongoose.Types.ObjectId(String(productId)), status: 'approved' } },
+      {
+        $group: {
+          _id: '$product',
+          average: { $avg: '$rating' },
+          count: { $sum: 1 },
+        },
       },
-    },
-  ]);
+    ]);
 
-  const ratings = result[0] || { average: 0, count: 0 };
-  await Product.findByIdAndUpdate(productId, {
-    'ratings.average': Math.round(ratings.average * 10) / 10,
-    'ratings.count': ratings.count,
-  });
+    const ratings = result[0] || { average: 0, count: 0 };
+    await Product.findByIdAndUpdate(productId, {
+      'ratings.average': Math.round(ratings.average * 10) / 10,
+      'ratings.count': ratings.count,
+    });
+  } catch (error) {
+    console.error('Recalculate rating error:', error);
+  }
 };
 
 const hasUserPurchasedProduct = async (userId, productId) => {
-  const order = await Order.findOne({
-    user: userId,
-    status: 'delivered',
-    'items.productId': String(productId),
-  });
-  return !!order;
+  try {
+    const order = await Order.findOne({
+      user: userId,
+      status: 'delivered',
+      'items.productId': String(productId),
+    });
+    return !!order;
+  } catch (error) {
+    console.error('Check purchase error:', error);
+    return false;
+  }
 };
 
 const createReview = async (req, res) => {
@@ -60,10 +69,16 @@ const createReview = async (req, res) => {
 
     const isVerifiedPurchase = await hasUserPurchasedProduct(req.user._id, productId);
 
+    let orderId = undefined;
+    if (isVerifiedPurchase) {
+      const order = await Order.findOne({ user: req.user._id, status: 'delivered', 'items.productId': String(productId) }).select('_id');
+      if (order) orderId = order._id;
+    }
+
     const review = await Review.create({
       product: productId,
       user: req.user._id,
-      order: isVerifiedPurchase ? (await Order.findOne({ user: req.user._id, status: 'delivered', 'items.productId': String(productId) }).select('_id'))._id : undefined,
+      order: orderId,
       rating,
       title: title || '',
       comment: comment.trim(),
@@ -113,7 +128,7 @@ const getProductReviews = async (req, res) => {
     ]);
 
     const ratingBreakdown = await Review.aggregate([
-      { $match: { product: new mongoose.Types.ObjectId(productId), status: 'approved' } },
+      { $match: { product: new mongoose.Types.ObjectId(String(productId)), status: 'approved' } },
       { $group: { _id: '$rating', count: { $sum: 1 } } },
       { $sort: { _id: -1 } },
     ]);
