@@ -3,8 +3,8 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { isAdminAuthenticated, setAdminSession } from '../utils/adminAuth'
 
 const API_BASE_URL =
-  (import.meta.env.VITE_ADMIN_API_URL && String(import.meta.env.VITE_ADMIN_API_URL).trim()) ||
-  (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
+  String(import.meta.env.VITE_ADMIN_API_URL || '').trim() ||
+  String(import.meta.env.VITE_API_URL || '').trim() ||
   (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')
 
 function AdminLoginPage() {

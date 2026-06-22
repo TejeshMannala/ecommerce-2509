@@ -18,6 +18,7 @@ const cartRoutes = require("./routes/cartRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const supportMessageRoutes = require("./routes/supportMessageRoutes");
 const adminAuthRoutes = require("./admin/routes/adminAuthRoutes");
 const adminRoutes = require("./admin/routes");
 
@@ -38,15 +39,16 @@ const defaultOrigins = [
   "http://localhost:5174",
   "http://localhost:3000",
   "https://freshbay.onrender.com",
+  "https://freshbay-admin.onrender.com",
 ];
 
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim())
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
   : defaultOrigins;
 
-if (!process.env.CORS_ORIGINS) {
+if (!process.env.CORS_ORIGIN) {
   console.warn(
-    "⚠️  CORS_ORIGINS is not set. Defaulting to local development origins:",
+    "⚠️  CORS_ORIGIN is not set. Defaulting to local development origins:",
     allowedOrigins.join(", ")
   );
 }
@@ -106,9 +108,8 @@ let dbConnected = false;
 ======================== */
 app.get("/api/health", (req, res) => {
   res.json({
-    status: dbConnected ? "ok" : "degraded",
-    service: "freshbay-api",
-    dbConnected,
+    success: true,
+    message: "Server Running",
   });
 });
 
@@ -136,6 +137,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/support-messages", supportMessageRoutes);
 app.use("/api/admin-auth", adminAuthRoutes);
 app.use("/api/admin", adminRoutes);
 

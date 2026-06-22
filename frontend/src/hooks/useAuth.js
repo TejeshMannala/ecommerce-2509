@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authAPI } from '../api/authAPI';
 import { loginFailure, loginStart, loginSuccess, logout, clearError } from '../redux/slices/authSlice';
@@ -9,13 +9,20 @@ import { clearOrders, fetchOrders } from '../redux/slices/orderSlice';
 export const useAuth = () => {
   const dispatch = useDispatch();
   const { user, token, isAuthenticated, isLoading, error } = useSelector((state) => state.auth);
+  const hydratingRef = useRef(false);
 
   const hydrateUserData = useCallback(async () => {
-    await Promise.allSettled([
-      dispatch(fetchCart()).unwrap(),
-      dispatch(fetchWishlist()).unwrap(),
-      dispatch(fetchOrders()).unwrap(),
-    ]);
+    if (hydratingRef.current) return;
+    hydratingRef.current = true;
+    try {
+      await Promise.allSettled([
+        dispatch(fetchCart()).unwrap(),
+        dispatch(fetchWishlist()).unwrap(),
+        dispatch(fetchOrders()).unwrap(),
+      ]);
+    } finally {
+      hydratingRef.current = false;
+    }
   }, [dispatch]);
 
   const login = useCallback(
@@ -26,7 +33,6 @@ export const useAuth = () => {
 
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('Token stored:', response.token);
 
         dispatch(loginSuccess({ user: response.user, token: response.token }));
         await hydrateUserData();

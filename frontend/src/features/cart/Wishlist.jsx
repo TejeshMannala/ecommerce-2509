@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../../components/common/Button';
 import { addCartItemAsync } from '../../redux/slices/cartSlice';
-import { fetchWishlist, removeWishlistItemAsync } from '../../redux/slices/wishlistSlice';
+import { removeWishlistItemAsync } from '../../redux/slices/wishlistSlice';
 import { applyImageFallback, resolveImageUrl } from '../../utils/image';
 
 const Wishlist = () => {
@@ -13,10 +13,6 @@ const Wishlist = () => {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state) => state.wishlist.items);
   const cartItems = useSelector((state) => state.cart.items);
-
-  useEffect(() => {
-    dispatch(fetchWishlist());
-  }, [dispatch]);
 
   const visibleWishlistItems = wishlistItems.filter(
     (item) => item?.productId && item?.name

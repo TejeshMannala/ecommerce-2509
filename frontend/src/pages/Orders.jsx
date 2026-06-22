@@ -13,8 +13,10 @@ const Orders = () => {
   const { orders, loading } = useSelector((state) => state.orders);
 
   useEffect(() => {
-    dispatch(fetchOrders());
-  }, [dispatch]);
+    if (orders.length === 0) {
+      dispatch(fetchOrders());
+    }
+  }, [dispatch, orders.length]);
 
   const sortedOrders = useMemo(
     () =>

@@ -1,20 +1,16 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ShoppingBag } from 'lucide-react';
 import Button from '../../components/common/Button';
 import CartItem from './CartItem';
 import CartSummary from './CartSummary';
-import { fetchCart, removeCartItemAsync, updateCartItemAsync } from '../../redux/slices/cartSlice';
+import { removeCartItemAsync, updateCartItemAsync } from '../../redux/slices/cartSlice';
 
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items: cartStateItems, loading } = useSelector((state) => state.cart);
-
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
 
   const cartItems = cartStateItems.map((item) => ({
     ...item,

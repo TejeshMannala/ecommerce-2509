@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim()) ||
+  String(import.meta.env.VITE_API_URL || '').trim() ||
   (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const getApiOrigin = (apiUrl) => {
@@ -9,7 +9,7 @@ const getApiOrigin = (apiUrl) => {
     if (typeof window !== 'undefined' && window.location?.origin) {
       return window.location.origin;
     }
-    return 'http://localhost:5000';
+    return '';
   }
 };
 

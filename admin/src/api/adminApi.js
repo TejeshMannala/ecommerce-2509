@@ -1,23 +1,11 @@
-import { getAdminToken } from '../utils/adminAuth'
-
-const PRODUCTION_API_URL = 'https://ecommerce-2509-server.onrender.com/api'
-const STALE_RENDER_API_HOSTS = [
-  'ecommerce-api.onrender.com',
-  'freshbay-api.onrender.com',
-]
+import { getAdminToken, clearAdminSession } from '../utils/adminAuth'
 
 const resolveApiBaseUrl = () => {
-  const configuredUrl =
-    (import.meta.env.VITE_ADMIN_API_URL && String(import.meta.env.VITE_ADMIN_API_URL).trim()) ||
-    (import.meta.env.VITE_API_URL && String(import.meta.env.VITE_API_URL).trim())
-  const isStaleRenderUrl = STALE_RENDER_API_HOSTS.some((host) => configuredUrl.includes(host))
-  const isLocalProductionUrl = !import.meta.env.DEV && /localhost|127\.0\.0\.1/.test(configuredUrl)
-
-  if (configuredUrl && !isStaleRenderUrl && !isLocalProductionUrl) {
-    return configuredUrl
-  }
-
-  return import.meta.env.DEV ? 'http://localhost:5000/api' : PRODUCTION_API_URL
+  const url =
+    String(import.meta.env.VITE_ADMIN_API_URL || '').trim() ||
+    String(import.meta.env.VITE_API_URL || '').trim()
+  if (url) return url
+  return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api'
 }
 
 const API_BASE_URL = resolveApiBaseUrl()
@@ -31,9 +19,6 @@ async function request(path, options = {}) {
 
   if (token) {
     headers.Authorization = `Bearer ${token}`
-    console.log('Sending request with token to:', path)
-  } else {
-    console.warn('No admin token found for request to:', path)
   }
 
   let response
@@ -42,19 +27,17 @@ async function request(path, options = {}) {
       ...options,
       headers,
     })
-    
-    console.log('Response status:', response.status, 'for path:', path)
-    if (response.status === 401) {
-      console.error('401 Unauthorized for path:', path)
-      console.error('Headers sent:', headers)
-      console.error('Token:', token)
-    }
   } catch {
     throw new Error(`Cannot connect to API server (${API_BASE_URL}). Start backend and try again.`)
   }
 
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
+    if (response.status === 401) {
+      clearAdminSession()
+      window.location.replace('/login')
+      throw new Error('Session expired. Please log in again.')
+    }
     throw new Error(data?.message || 'Request failed')
   }
 

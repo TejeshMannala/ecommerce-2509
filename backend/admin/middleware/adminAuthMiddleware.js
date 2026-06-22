@@ -4,6 +4,10 @@ const Admin = require('../models/Admin');
 const getJwtSecret = () => String(process.env.JWT_SECRET || '').trim();
 
 const protectAdmin = async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   try {
     const authHeader = req.headers.authorization || '';
     if (!authHeader.startsWith('Bearer ')) {

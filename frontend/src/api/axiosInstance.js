@@ -1,22 +1,10 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const PRODUCTION_API_URL = 'https://ecommerce-2509-server.onrender.com/api';
-const STALE_RENDER_API_HOSTS = [
-  'ecommerce-api.onrender.com',
-  'freshbay-api.onrender.com',
-];
-
 const resolveApiBaseUrl = () => {
-  const configuredUrl = String(import.meta.env.VITE_API_URL || '').trim();
-  const isStaleRenderUrl = STALE_RENDER_API_HOSTS.some((host) => configuredUrl.includes(host));
-  const isLocalProductionUrl = !import.meta.env.DEV && /localhost|127\.0\.0\.1/.test(configuredUrl);
-
-  if (configuredUrl && !isStaleRenderUrl && !isLocalProductionUrl) {
-    return configuredUrl;
-  }
-
-  return import.meta.env.DEV ? 'http://localhost:5000/api' : PRODUCTION_API_URL;
+  const url = String(import.meta.env.VITE_API_URL || '').trim();
+  if (url) return url;
+  return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api';
 };
 
 const API_BASE_URL = resolveApiBaseUrl();
@@ -29,15 +17,38 @@ const axiosInstance = axios.create({
   },
 });
 
+// Endpoints that require authentication
+const PROTECTED_ENDPOINTS = [
+  '/cart', '/wishlist', '/orders', '/auth/me', '/auth/refresh',
+  '/auth/logout',
+];
+
+const isProtectedEndpoint = (url = '') =>
+  PROTECTED_ENDPOINTS.some((prefix) => url.startsWith(prefix));
+
 // Request interceptor to add auth token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    const isProtected = isProtectedEndpoint(config.url);
     config._hadAuthToken = Boolean(token);
+    config._isProtected = isProtected;
+
+    if (!token && isProtected) {
+      const currentPath = window.location.pathname;
+      const isAlreadyOnAuthPage = currentPath === '/login' || currentPath === '/register';
+      if (!isAlreadyOnAuthPage) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        toast.error('Session expired. Please log in again.');
+        window.location.replace('/login');
+      }
+      return Promise.reject(new Error('Not authorized, token missing'));
+    }
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log(`API CALL: ${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
@@ -65,14 +76,13 @@ axiosInstance.interceptors.response.use(
       requestUrl.includes('/auth/refresh');
     
     if (status === 401) {
-      const hadAuthToken = Boolean(error.config?._hadAuthToken) || Boolean(error.config?.headers?.Authorization);
-      if (!isAuthEndpoint && hadAuthToken) {
-        const currentPath = window.location.pathname;
-        const isAlreadyOnAuthPage = currentPath === '/login' || currentPath === '/register';
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        toast.error('Session expired. Please log in again.');
-        if (!isAlreadyOnAuthPage) window.location.replace('/login');
+      const currentPath = window.location.pathname;
+      const isAlreadyOnAuthPage = currentPath === '/login' || currentPath === '/register';
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      toast.error('Session expired. Please log in again.');
+      if (!isAlreadyOnAuthPage && !isAuthEndpoint) {
+        window.location.replace('/login');
       }
     } else if (status === 403) {
       toast.error('You do not have permission to perform this action.');

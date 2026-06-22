@@ -8,6 +8,14 @@ export const getStoredUser = () => {
 };
 
 export const isAuthenticatedUser = (authState) => {
+  const tokenFromStore = authState?.token;
+  const tokenFromStorage = localStorage.getItem('token');
+  const hasToken = Boolean(tokenFromStore || tokenFromStorage);
+
+  if (!hasToken) {
+    return false;
+  }
+
   if (authState?.isAuthenticated || authState?.user) {
     return true;
   }

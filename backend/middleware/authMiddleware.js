@@ -4,6 +4,10 @@ const User = require('../models/User');
 const getJwtSecret = () => String(process.env.JWT_SECRET || '').trim();
 
 const protect = async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   try {
     const authHeader = req.headers.authorization || '';
     if (!authHeader.startsWith('Bearer ')) {
