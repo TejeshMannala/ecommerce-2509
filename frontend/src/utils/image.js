@@ -1,5 +1,10 @@
+const resolveApiUrl = (url) => {
+  if (!url) return '';
+  return url.endsWith('/api') ? url : url.replace(/\/+$/, '') + '/api';
+};
+
 const API_BASE_URL =
-  String(import.meta.env.VITE_API_URL || '').trim() ||
+  resolveApiUrl(String(import.meta.env.VITE_API_URL || '').trim()) ||
   (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 const getApiOrigin = (apiUrl) => {

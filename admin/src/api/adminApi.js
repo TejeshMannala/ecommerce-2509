@@ -1,9 +1,14 @@
 import { getAdminToken, clearAdminSession } from '../utils/adminAuth'
 
+const ensureApiSuffix = (url) => {
+  if (!url) return ''
+  return url.endsWith('/api') ? url : url.replace(/\/+$/, '') + '/api'
+}
+
 const resolveApiBaseUrl = () => {
   const url =
-    String(import.meta.env.VITE_ADMIN_API_URL || '').trim() ||
-    String(import.meta.env.VITE_API_URL || '').trim()
+    ensureApiSuffix(String(import.meta.env.VITE_ADMIN_API_URL || '').trim()) ||
+    ensureApiSuffix(String(import.meta.env.VITE_API_URL || '').trim())
   if (url) return url
   return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api'
 }

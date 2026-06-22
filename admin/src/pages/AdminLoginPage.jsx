@@ -2,9 +2,14 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { isAdminAuthenticated, setAdminSession } from '../utils/adminAuth'
 
+const ensureApiSuffix = (url) => {
+  if (!url) return ''
+  return url.endsWith('/api') ? url : url.replace(/\/+$/, '') + '/api'
+}
+
 const API_BASE_URL =
-  String(import.meta.env.VITE_ADMIN_API_URL || '').trim() ||
-  String(import.meta.env.VITE_API_URL || '').trim() ||
+  ensureApiSuffix(String(import.meta.env.VITE_ADMIN_API_URL || '').trim()) ||
+  ensureApiSuffix(String(import.meta.env.VITE_API_URL || '').trim()) ||
   (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')
 
 function AdminLoginPage() {

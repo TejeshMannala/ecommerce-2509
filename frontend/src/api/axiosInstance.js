@@ -3,7 +3,9 @@ import toast from 'react-hot-toast';
 
 const resolveApiBaseUrl = () => {
   const url = String(import.meta.env.VITE_API_URL || '').trim();
-  if (url) return url;
+  if (url) {
+    return url.endsWith('/api') ? url : url.replace(/\/+$/, '') + '/api';
+  }
   return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api';
 };
 
